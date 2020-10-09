@@ -43,11 +43,10 @@
 
 ## 7 Oct 2020
 
-* Did not work on Dissertation
+* *0.5 hours* Modified GitLab
 
 ## 8 Oct 2020
 
-* *0.5 hours* Modified GitLab
 * *0.5 hours* Prepared for first advisor meeting
 
 ### 9 Oct 2020
