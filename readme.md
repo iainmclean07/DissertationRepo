@@ -1,3 +1,8 @@
+# Full abstraction of the encoding of session types
+
+This dissertation is a purely theoretical exploration into the encoding of session types.
+
+
 # Guidance
 This is a suggested template for a project. You can modify it as you please, but
 but remember to keep:

@@ -1,9 +1,9 @@
 # Timelog
 
-* PROJECT NAME
-* YOUR NAME
-* STUDENT_ID
-* SUPERVISOR NAME
+* Full abstraction for the encoding of session types
+* Iain William McLean
+* 2308499M
+* Ornela Dardha
 
 ## Guidance
 
@@ -13,14 +13,44 @@
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
 ## Week 1
+### 28 Sep 2020
+* *2 hour* Read over papers supplied by Ornela
 
-### 19 Oct 2019
+### 29 Sep 2020
+* Did not work on Dissertation
 
-* *4 hours* Read the project guidance notes
-* *0.5 hour* Created GitLab repository and cloned the cookiecutter for the projects
-* *1 hour* Modified dissertation template, compiled  
 
-## 20 Oct 2019
+### 30 Sep 2020
+* Did not work on Dissertation
 
-* *1 hour* meeting with supervisor
-* *2 hours* writing initial version of test harness
+
+### 1 Sep 2020
+* Did not work on Dissertation
+
+
+### 2 Sep 2020
+* *2 hours* Read over papers supplied by Ornela
+
+## Week 2
+### 5 Oct 2020
+
+* *1 hours* Watched video lecture on Pi Calculus
+* *0.5 hour* Created GitLab repository (Private) and added template
+
+## 6 Oct 2020
+
+* Did not work on Dissertation
+
+## 7 Oct 2020
+
+* Did not work on Dissertation
+
+## 8 Oct 2020
+
+* *0.5 hours* Modified GitLab
+* *0.5 hours* Prepared for first advisor meeting
+
+### 9 Oct 2020
+
+* *1 hour* Meeting with supervisor
+* *2 hours* Read over papers supplied by Ornela
