@@ -16,11 +16,17 @@ Trying to understand the full scope of the project. Reading papers supplied by O
 Continue reading papers. After first meeting, find books recommended (recorded in the minutes) may have to retrieve them from Patryk. Follow guidance given by Ornela and continue reading the papers. 
 
 * **Week 3**
-
+Continue reading papers. 
 
 * **Week 4**
+Continue reading papers. 
+
 * **Week 5**
+Continue reading papers. Study encoding try get to grips on how to form my own Pi-calc examples
+
 * **Week 6**
+Reading over Full abstraction paper, trying to apply to my context
+
 * **Week 7**
 * **Week 8**
 * **Week 9**

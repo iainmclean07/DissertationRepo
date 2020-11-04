@@ -37,15 +37,15 @@
 * *1 hours* Watched video lecture on Pi Calculus
 * *0.5 hour* Created GitLab repository (Private) and added template
 
-## 6 Oct 2020
+### 6 Oct 2020
 
 * Did not work on Dissertation
 
-## 7 Oct 2020
+### 7 Oct 2020
 
 * *0.5 hours* Modified GitLab
 
-## 8 Oct 2020
+### 8 Oct 2020
 
 * *0.5 hours* Prepared for first advisor meeting
 
@@ -53,3 +53,81 @@
 
 * *1 hour* Meeting with supervisor
 * *2 hours* Read over papers supplied by Ornela
+
+## Week 3
+
+### 12 Oct 2020
+
+* Did not work on Dissertation
+
+### 13 Oct 2020
+
+* Did not work on Dissertation
+
+### 14 Oct 2020
+
+* Did not work on Dissertation
+
+### 15 Oct 2020
+
+* *3.5 hours* Reading over Session Types Revisited
+
+### 16 Oct 2020
+
+* *1 hour* Advisor meeting
+
+## Week 4
+
+### 19 Oct 2020
+
+* Did not work on Dissertation
+
+### 20 Oct 2020
+
+* *2 hours* Reading over Session Types Revisited, and looked over slides on Teams
+
+### 21 Oct 2020
+
+* Did not work on Dissertation
+
+### 22 Oct 2020 
+
+* *2 hours* Reading over Slides on teams
+
+### 23 Oct 2020 
+
+* *1 hour* Meeting
+* *4 hours* Reading over Session Types Revisted, and looking over slides on Teams
+
+### 26 Oct 2020
+
+* *2 hours* Reading over slides from ToC
+
+### 27 Oct 2020
+
+* Did not work on Dissertation
+
+### 28 Oct 2020
+
+* Did not work on Dissertation
+
+### 29 Oct 2020
+
+* Did not work on Dissertation
+
+### 30 Oct 2020
+
+* *5 hours* Reading over papers and slides
+
+### 2 Nov 2020
+
+* Did not work on Dissertation
+
+### 3 Nov 2020
+
+* Did not work on Dissertation
+
+### 4 Nov 2020
+
+* *4 hours* Read over presentation by Ornela, looked over further slides
+* *1 hour* Reading over paper on Full abstraction
