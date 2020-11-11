@@ -140,3 +140,15 @@
 
 * *1.5 hours* Advisor meeting
 * *4 hours* Continued reading over papers, started looking into how to write definitions from Full Abstraction paper
+
+### 9 Nov 2020
+
+* *2 hours* Reading over papers
+
+### 10 Nov 2020
+
+* Did not work on Dissertation due to the full abstraction paper not being available
+
+### 11 Nov 2020
+
+* Did not work on Dissertation due to the full abstraction paper not being available
