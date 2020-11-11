@@ -28,6 +28,8 @@ Continue reading papers. Study encoding try get to grips on how to form my own P
 Reading over Full abstraction paper, trying to apply to my context
 
 * **Week 7**
+For next 2 weeks look over trying to define some of the Definitions and Theorems in the full abstraction paper.
+
 * **Week 8**
 * **Week 9**
 * **Week 10**

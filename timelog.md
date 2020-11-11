@@ -131,3 +131,12 @@
 
 * *4 hours* Read over presentation by Ornela, looked over further slides
 * *1 hour* Reading over paper on Full abstraction
+
+### 5 Nov 2020
+
+* *4 hours* Read over papers and prepared for meeting
+
+### 6 Nov 2020
+
+* *1.5 hours* Advisor meeting
+* *4 hours* Continued reading over papers, started looking into how to write definitions from Full Abstraction paper
