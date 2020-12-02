@@ -31,9 +31,19 @@ Reading over Full abstraction paper, trying to apply to my context
 For next 2 weeks look over trying to define some of the Definitions and Theorems in the full abstraction paper.
 
 * **Week 8**
+Defining Congruences and Equivalences.
+* Looking into references within the Full abstraction paper, and defining some of the equivalences that are defined in that paper.
+
 * **Week 9**
+Understanding the full abstraction result from the long paper provided by Ornela
+Looking at the Polyadic pi-calculus paper and adapting the results to find the best way possible for the dissertation
+
 * **Week 10**
+Week was dedicated to completing courseworks
+
 * **Week 11 [PROJECT WEEK]**
+Creating a report of all the issues that need to be completed. Finding all the issues that I need to clear with Ornela, and planning my work for over Christmas.
+
 * **Week 12 [PROJECT WEEK]** Status report submitted.
 
 ## Winter break

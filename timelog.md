@@ -152,3 +152,62 @@
 ### 11 Nov 2020
 
 * Did not work on Dissertation due to the full abstraction paper not being available
+
+### 12 Nov 2020
+
+* *4 hours* Reading over the full abstraction paper and looking at references about equivalences
+
+### 13 Nov 2020
+
+* *1 hour* Advisor meeting
+* *3 hours* Reading over papers
+
+### 16 Nov 2020
+
+* *2 hours* Reading over papers, creating notes and starting writing defintions
+
+### 17 Nov 2020
+
+* Did not work on Dissertation
+
+### 18 Nov 2020
+
+* *4 hours* Reading over papers and writing definitions
+* *1 hour* Prepared for advisor meeting, finding questions to ask
+
+### 19 Nov 2020
+
+* Did not work on Dissertations
+
+### 20 Nov 2020
+
+* *1 hour* advisor meeting
+* *2 hours* Reading over papers
+
+### 23 Nov 2020
+
+* Did not work on Dissertation
+
+### 24 Nov 2020
+
+* Did not work on Dissertation
+
+### 25 Nov 2020
+
+* Did not work on Dissertation
+
+### 26 Nov 2020
+
+* Did not work on Dissertation
+
+### 27 Nov 2020
+
+* Did not work on Dissertation
+
+### 30 Nov 2020
+
+* *2 hours* Reading over Full abstraction paper and the definition of barbed congruence
+
+### 1 Nov 2020
+
+* Did not work on Dissertation
