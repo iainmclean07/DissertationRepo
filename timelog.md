@@ -208,6 +208,29 @@
 
 * *2 hours* Reading over Full abstraction paper and the definition of barbed congruence
 
-### 1 Nov 2020
+### 1 Dec 2020
 
 * Did not work on Dissertation
+
+### 2 Dec 2020
+
+* Did not work on Dissertation
+
+### 3 Dec 2020
+
+* *4 hours*  Continued reading Full abs paper
+
+### 4 Dec 2020
+
+* *4 hours* Started writing up Definition 36 in full abs paper
+
+* Did not work on Dissertation
+
+### 7 Dec 2020
+
+* *6 hours* Understanding labelled transition system, and adapting it from the full abs paper to STR
+
+### 8 Dec 2020
+
+* *2 hours* Watched the Dissertation writing lecture
+* *4 hours* Continued from Definition 36, worked down to Definition 40
