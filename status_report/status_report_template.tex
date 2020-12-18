@@ -3,8 +3,8 @@
 \usepackage{times}
     \usepackage{fullpage}
     
-    \title{ {{cookiecutter.project_title}}
-    \author{ {{cookiecutter.student_name}} - {{cookiecutter.student_id}} }
+    \title{Full abstraction for the encoding of session types}
+    \author{Iain McLean - 2308499m}
 
     \begin{document}
     \maketitle
@@ -18,51 +18,68 @@
 
 \subsubsection{Motivation}\label{motivation}
 
-\emph{{[}Clearly motivate the purpose of your project; why someone would
-care about what you are doing{]}}
+\emph{In the paper Session Types Revisited, a simple session-typed Pi-Calculus was defined with a secure encoding system to a standard typed pi-calculus. The point of this paper is to extend the work that was completed in Session Types Revisited and prove that the observable behaviour of the session-
+typed calculus and the linearly typed pi-calculus is fully abstract}
 
 \subsubsection{Aims}\label{aims}
 
-\emph{{[}Clearly state what the project is intended to do. This should
-be something which is measurable; it should be possible to tell if you
-succeeded{]}}
+\emph{Extend $\pi^{ses}$ (Session Typed Pi Calculus) and $\pi^{lin}$ (Standard Typed Pi Calculus) such that there is barbed congruence so that processes' observational behaviour can be tested using may must congruence relations. Then prove there is some relation that satisfies may must testing to prove some process in $\pi^{ses}$ and $\pi^{lin}$ are observationally equivalent encoded in any context.}
 
 \subsection{Progress}\label{progress}
 
-\emph{{[}Briefly state your progress so far, as a bulleted list{]}}
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parskip}{0pt}
+\item Read over Session Types Revisited
+\item Read over the Full Abstraction Paper (short and long)
+\item Read over Types and full abstraction for polyadic Pi-calculus
+\item Read over Testing Theories for Asynchronous Languages
+\item Read over The Pi-Calculus: A Theory of Mobile Processes
+\item Defined a labelled transition system for Pi-Calculus with Session types
+\item Defined Barbs and Barbed bisimulation for the Pi-Calculus with Session types and the linearly typed Pi-Calculus
+\item Defined a maximal reduction sequence (for the proof in the Full Abs paper)
+\item Started on the Full Abstraction Proof
+
+\end{itemize}
 
 \subsection{Problems and risks}\label{problems-and-risks}
 
 \subsubsection{Problems}\label{problems}
 
-\emph{{[}What problems have you had so far, that have held up the
-project?{]}}
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parskip}{0pt}
+\item Getting to grips with theoretical computer science
+\item Understanding the mathematical terms surrounding this topic
+\item May be spending too much time reading
+\end{itemize}
+
 
 \subsubsection{Risks}\label{risks}
 
-\emph{{[}What problems do you foresee in the future and how will you
-mitigate them?{]}}
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parskip}{0pt}
+\item Getting sidetracked by other reading
+\item Theory of Mobile Processes book follows a different more complex proof for Full Abstraction which may need to be studied further which may delay me further.
+\end{itemize}
 
 \subsection{Plan}\label{plan}
 
-\emph{{[}Time plan, in roughly weekly to monthly blocks, up until
-submission week{]}}
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parskip}{0pt}
+\item Week 1 - 2: More in depth draft of results and proposed extensions
+\item Week 3 - 5: Refine definition, begin write up of dissertation
+\item Week 6 - 8: Write up draft of dissertation
+\item Week 8 - 10: Final write up
+\end{itemize}
 
     
 \subsection{Ethics and data}\label{ethics}
-\emph{Specify what ethical approval you need to do your evaluation and how you are approaching it. This is mandatory. 
-Specify what data you expect to collect in your evaluation. Explain how this data will help you evaluate your project.
-}
 
-Options for ethics:
-\item This project does not involve human subjects or data. No approval required.
-\item I have verified that the ethics checklist will apply to any evaluation I need to do. I will sign and complete the checklist.
-\item I have sought ethical guidance from the School's ethics convener and I will:
-\begin{itemize}
-    \item Proceed under specific instructions from the Ethics convener (e.g. modified checklist).
-    \item Apply for College Ethics Board approval.
-    \item Other procedure (give details)
-\end{itemize}    
+Options for ethics: \\
+This project does not involve human subjects or data. No approval required.
 
 
 \end{document}
