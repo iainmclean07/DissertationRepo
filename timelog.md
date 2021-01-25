@@ -99,6 +99,8 @@
 * *1 hour* Meeting
 * *4 hours* Reading over Session Types Revisted, and looking over slides on Teams
 
+## Week 5
+
 ### 26 Oct 2020
 
 * *2 hours* Reading over slides from ToC
@@ -118,6 +120,8 @@
 ### 30 Oct 2020
 
 * *5 hours* Reading over papers and slides
+
+## Week 6
 
 ### 2 Nov 2020
 
@@ -141,6 +145,8 @@
 * *1.5 hours* Advisor meeting
 * *4 hours* Continued reading over papers, started looking into how to write definitions from Full Abstraction paper
 
+## Week 7
+
 ### 9 Nov 2020
 
 * *2 hours* Reading over papers
@@ -161,6 +167,8 @@
 
 * *1 hour* Advisor meeting
 * *3 hours* Reading over papers
+
+## Week 8
 
 ### 16 Nov 2020
 
@@ -184,6 +192,8 @@
 * *1 hour* advisor meeting
 * *2 hours* Reading over papers
 
+## Week 9
+
 ### 23 Nov 2020
 
 * Did not work on Dissertation
@@ -203,6 +213,8 @@
 ### 27 Nov 2020
 
 * Did not work on Dissertation
+
+## Week 10
 
 ### 30 Nov 2020
 
@@ -226,6 +238,8 @@
 
 * Did not work on Dissertation
 
+## Week 11
+
 ### 7 Dec 2020
 
 * *6 hours* Understanding labelled transition system, and adapting it from the full abs paper to STR
@@ -234,3 +248,70 @@
 
 * *2 hours* Watched the Dissertation writing lecture
 * *4 hours* Continued from Definition 36, worked down to Definition 40
+
+### 9 Dec 2020
+
+* *6 hours* Continued proving Definition 36 working down from the labelled transition system
+
+### 10 Dec 2020
+
+* *8 hours* Created a Google Doc of some of the results I have created over the last week.
+
+### 11 Dec 2020
+
+* *6 hours* Continued with Google docs implementation. Related sections of STR to fullabs domain
+
+## Christmas Break
+
+* Read over relevant sections of "The Pi-Calculus: A Theory of Mobile Processes".
+* Typed results into LaTeX
+
+## Week 17
+
+### 11 Jan 2021
+
+* *6 hours* Identified areas of STR that will be relevant to mention in my disseration
+
+### 12 Jan 2021
+
+* *1 hour* Dissertation meeting with Ornela. Reviewed the work completed so far, and decided to continue working on the LaTeX implementation.
+* *3 hours* Writing up results in LaTeX
+
+### 13 Jan 2021
+
+* *6 hours* Continued writing results in LaTeX
+
+### 14 Jan 2021
+
+* *2 hours* Focused on understanding the encoding, identified the Operational Correspondance section that will be used in the full abstraction proof.
+
+### 15 Jan 2021
+
+* *4 hours* Writing results in LaTeX
+
+## Week 18 
+
+### 18 Jan 2021
+
+* *6 hours* Writing results in LaTex
+
+### 19 Jan 2021
+
+* *1 hour* Dissertation meeting, Ornela will review my work in LaTeX after I add more text to the proofs
+* *2 hours* Further research into different sections of the results, wrote up relevant details
+
+### 20 Jan 2021
+
+* *2 hours* Writing up more in LaTeX file
+
+### 21 Jan 2021
+
+* *2 hours* Finished writing up initial results in LaTeX, sent to Ornela to review
+
+### 22 Jan 2021
+
+* Did not work on Dissertation
+
+## Week 19
+
+### 25 Jan 2021
