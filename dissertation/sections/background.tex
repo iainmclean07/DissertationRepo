@@ -1,0 +1,876 @@
+
+\begin{document}
+
+This section will introduce the \textit{session typed $\pi$-calculus} \cite{dardha2017session} and the linear typed $\pi$-calculus that will encode the former calculus. We first give a high-level description of the $\pi$-calculus in \autoref{piCalculus}, we will then give a formal definition of session typed $\pi$-calculus in \autoref{SessionTypes} and then display the linearly typed $\pi$-calculus in \autoref{LinearTypes} which will be used in the encoding described in \autoref{Encoding}
+
+
+
+\section{The $\pi$-Calculus} \label{piCalculus}
+$\pi$-Calculus was created by \citep{milner1992calculus} based on the previous work completed surrounding CCS (Calculus of communicating systems) \cite{milner1980calculus}. It provides a solid theoretical model to structure complex distributed systems by representing computation as lightweight processes interacting with each other through message passing over channels. Messages can range from simple well-typed values or free and bound channels. Allowing including communication channels in messages means that the state of the system can vary massively from one step to another, as processes can "discover" new choices within the system as new resources are made available to different processes in a non-deterministic manner.  
+
+\section{Session Types} \label{SessionTypes}
+
+Session types are a formalism developed for process calculi to structure communication, such that processes follow a sequential set of \textit{input} and \textit{output} operations. This sequence becomes relevant when modelling the use of network protocols in distributed systems. They are instrumental as they guarantee communication privacy, as the channel in which communication is taking place is only known to the sender and receiver. Session types are extended to allow for internal and external \textit{choices} using the \textit{Branch} and \textit{Select} types, which specify that a process can offer a set of processes and, in turn that a label selects an index of that set. Names typed as session processes will be referred to as \textit{"session endpoints"}.
+
+\begin{figure}[ht]
+    \centering
+    % \includegraphics{}
+    \begin{align*}
+            \begin{split}
+                T ::= \: & S \hspace{2mm} \\
+                & \#T\hspace{2mm}\\
+                & Unit \hspace{2mm}\\
+                & ... \hspace{2mm}\\
+            \end{split}
+            &
+            \begin{split}
+                & \text{(Session Type)}\hspace{7mm}\\
+                & \text{(Channel Type)}\hspace{7mm}\\
+                & \text{(Unit Value)}\hspace{7mm}\\
+                & \text{(Other Ground Types)}\hspace{7mm}\\
+            \end{split}
+            &
+            \begin{split}
+                S ::= \: & end \hspace{2mm}\\
+                & ?T.S \hspace{2mm}\\
+                & !T.S \hspace{2mm}\\
+                & \& \{l_i : S_i\}_{i \in I} \hspace{2mm}\\
+                & \oplus\{l_i : S_i\}_{i \in I} \hspace{2mm}\\
+            \end{split}
+            &
+            \begin{split}
+                & \text{(termination)} \\
+                & \text{(Receive)} \\
+                & \text{(Send)} \\
+                & \text{(Branch)} \\
+                & \text{(Select)} \\
+            \end{split}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+
+    \caption{Syntax of types in the session typed $\pi$-calculus adapted from \citep{dardha2017session}}
+    \label{fig:typeSyntax}
+\end{figure}
+
+We will use $\boldsymbol{T}$ to range over types and $\boldsymbol{S}$ to range over session types. 
+
+\subsubsection{Description of Types} The terminal symbol $\boldsymbol{end}$ signals the end of communication in a session endpoint. $\boldsymbol{?T.S}$ is a session typed process assigned to receive on the endpoint, and $\boldsymbol{!T.S}$ its dual; to send on a session endpoint. Both respectively continue with the session protocol specified by $\boldsymbol{S}$. The Branch type $\boldsymbol{\& \{l_i : S_i\}_{i \in I}}$ maps distinct labels to session types ranged over by the \textit{indexing set} $\boldsymbol{I}$, it is an \textit{external choice} operator and can only continue when a label is received. The Select type $\boldsymbol{\oplus \{l_i : S_i\}_{i \in I}}$ is similar to the Branch type however it is an \textit{internal choice} operator and can only continue by emitting a label mapping to a session type in the indexing set $I$.
+
+$T$ ranges over standard $\pi$-types and contains session types, as well as the channel type $\boldsymbol{\#T}$, the $\boldsymbol{Unit}$ value and other types such as $Int$, $String$, $Bool$ classified here by $...$ which we can think of as the "wildcard symbol".
+
+% Just as in \cite{vasconcelos2012fundamentals} we will be recognising variables as co-names, as they represent either end of a communication channel. Using co-names in sessions allows us to more easily abstract the definition of duality, as Session Types model the symmetrical nature of communication. It also means that when type checking the system, if on one side of the channel, the name being sent is of a specific type then the receiver must be its dual and be expecting to receive the same type. We present the duality definition formally:
+
+\subsubsection{Co-Names}
+
+For standard communication, we will recognise these variables as standard $\pi$-channels such as in \citep{gay2005subtyping}. For session communication, we will recognise variables as co-names \cite{vasconcelos2012fundamentals}, with either side being a session endpoint. Using co-names in sessions allows us to abstract the notion of duality more easily, as session types model the symmetrical nature of communication. 
+
+\subsubsection{Duality} We introduce the formal definition of duality in \autoref{fig:dualses}, such that when two processes are willing to communicate, they must agree on a protocol as if one process was to send, then the other must receive to avoid deadlock.
+
+\begin{figure}[h]
+    \centering
+    \begin{equation*}
+        \begin{split}
+            \overline{end} \triangleq & \;end \\
+            \overline{!T.S} \triangleq & \;?T.S \\
+            \overline{?T.S} \triangleq & \;!T.S \\
+            \overline{\oplus \{l_i : S_i\}_{i \in I}} \triangleq & \; \&\{l_i : \overline{S}_i\}_{i \in I} \\
+            \overline{\&\{l_i : S_i\}_{i \in I}} \triangleq & \; \oplus \{l_i : \overline{S}_i\}_{i \in I}\\
+        \end{split}
+    \end{equation*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Duality of Session Types adapted from \citep{dardha2017session}}
+    \label{fig:dualses}
+\end{figure}
+
+This duality definition will be used when type checking processes so that communication is safe and opposite ends of session endpoints perform dual operations.
+
+% On one side of the name a process is able to write out on the channel, and on the other side a process is able to read from the channel. This can be useful in organising the structure of threads where resources are deliberately separated so that they can work independently. This duality is a crucial part of the $\pi$-calculus, and session types as it ensures communication safety and represents the linear nature of these channels. 
+
+
+ 
+We will now present the processes that are typed with these defined session types.
+
+\subsection{Process Terminology}
+% We will give a brief description of the terminology surrounding processes that we will be using throughout the dissertation, as a downfall of many $\pi$-calculus papers is the fact that they abuse notation and overload terms frequently. We will first provide the syntax of the session typed $\pi$-Calculus and the vocabulary associated with these terms. 
+
+The syntax of processes is presented in \autoref{fig:procSyntax}. 
+
+We adopt the \textit{Barendregt name convention} which states that there is an infinite number of names such that there always exists a fresh name available to be bound and that the bound names of a process are always different from the free names and the names of any substitutions. ${\alpha}$\textit{-convertibility} is defined in \citep{sangiorgi2003pi} stating that $P =_\alpha Q$ if $Q$ is obtainable through a finite number of changes to bound names. To give a brief example; 
+
+\begin{equation*}
+    P \equiv (\nu z)(z!\langle y \rangle.0) =_\alpha (\nu w)(w!\langle y \rangle.0) \equiv Q
+\end{equation*}
+
+To simplify further definitions, we will use $\boldsymbol=$ to represent $\alpha$-convertibility.
+% We use $P, Q$ to range over the processes and $x, y$ to range over channels and session endpoints. $v$ 
+
+\begin{figure}[h]
+    \centering
+    % \includegraphics{}
+    \begin{align*}
+            \begin{split}
+                P, Q ::=\: & x!\langle v \rangle.P\hspace{2mm} \\
+                & x?(y).P\hspace{2mm}\\
+                & x \vartriangleleft l_j.P \hspace{2mm}\\
+                & x \vartriangleright \{l_i : P_i \} \hspace{2mm}\\[10pt]
+                v ::= \: & x \\
+            \end{split}
+            &
+            \begin{split}
+                & \text{(Output)}\hspace{7mm}\\
+                & \text{(Input)}\hspace{7mm}\\
+                & \text{(Select)}\hspace{7mm}\\
+                & \text{(Branch)}\hspace{7mm}\\[10pt]
+                & \text{(name)}\hspace{7mm}\\    
+            \end{split}
+            &
+            \begin{split}
+                & 0 \hspace{2mm}\\
+                & P \; | \; Q \hspace{2mm}\\
+                & (\nu xy) P \hspace{2mm}\\
+                & (\nu x) P \hspace{2mm}\\[10pt]
+                & \star \\
+            \end{split}
+            &
+            \begin{split}
+                & \text{(Inaction)} \\
+                & \text{(Composition)} \\
+                & \text{(Session Restriction)} \\
+                & \text{(Channel Restriction)} \\[10pt]
+                & \text{(Unit Value)} \\
+            \end{split}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Syntax of processes in the session typed $\pi$-calculus adapted from \citep{dardha2017session}}
+    \label{fig:procSyntax}
+\end{figure}
+
+We use $P$, $Q$ to range over processes, $x, y$ to range over names, $v$ to represent values and $l_n$ for labels. 
+
+\subsubsection{Description of Processes}
+The process $\boldsymbol{x!\langle v \rangle}$ describes the process that can output the value $\boldsymbol{v}$ on channel $\boldsymbol{x}$ where $\boldsymbol{v}$ can be unit value or a channel (name). The process $\boldsymbol{x?(y)}$ is the process that can receive on name $\boldsymbol{x}$. The select process $\boldsymbol{x \vartriangleleft l_j}$ outputs label $\boldsymbol{l_j}$ on name $\boldsymbol{x}$ which corresponds to a branching process in some process ready to receive on $\boldsymbol{x}$. The branching process $\boldsymbol{x \vartriangleright \{l_i : P_i\}}$ receives label on $\boldsymbol{x}$ and branches according to the label received where $\boldsymbol{l_j}$, $\boldsymbol{j \in I}$ where $\boldsymbol{I}$ is the index set ranging over processes $\boldsymbol{P_i}$, $\boldsymbol{i \in I}$. Inaction represents a process that cannot perform any further actions, and thus terminates. $\boldsymbol{P \: | \: Q}$ describes two processes $\boldsymbol{P}$ and $\boldsymbol{Q}$ placed in the same environment allowing them to communicate over free or bound names. Session Restriction $\boldsymbol{(\nu xy) P}$ creates the two session endpoints by binding the names $\boldsymbol{x, y}$ in $\boldsymbol{P}$. Channel Restriction $\boldsymbol{(\nu x) P}$ binds the name $\boldsymbol{x}$ in $\boldsymbol{P}$. 
+
+
+% \begin{itemize}
+%     \item Output - The process can output the name v on channel x, and continue with process $P$.
+%     \item Input - The process can receive name y on channel x, and continue with process $P$.
+%     \item Select - The process can send label $l_j$ to a branching process, and continue with process $P$.
+%     \item Branch - The process can receive label $l_i$ on $x$ and continue with process $P_i$.
+%     \item Inaction - The process cannot perform any action.
+%     \item Composition - Processes $P, Q$ can proceed independently, and can interact with one another using shared names.
+%     \item Session Restriction - Co-names $x, y$, representing session endpoints, are bound in process $P$.
+%     \item Channel Restriction - Name $x$ is bound in process $P$.
+% \end{itemize}
+
+% We will extend the example in figure \ref{fig:servertypes} to define the related processes.
+
+\subsection{Client Server Example}
+
+To give an example of how session types can be used, we will show a simple example of a server that can offer either the multiplication operator, the division operator or the equality operator and a client that can select one of these operations. We will present the session types (Top of \autoref{fig:clientServerExample1}) which will type names $x, y$ respectively. We will also define the related processes (Bottom of \autoref{fig:clientServerExample1}) which will be typed with the session types. Assuming that integers and booleans are predefined ground types, we will derive the simple example:
+
+% \begin{figure}[h]
+%     \centering
+%     \begin{equation*}
+%         \begin{split}
+%             s \triangleq \& \:\{ & mult:\;?Int.?Int.!Int.end \\
+%             & div:\;?Int.?Int.!Int.end \\
+%             & eq: \;?Int.?Int.!Bool.end \} \\
+%         \end{split}
+%         \end{equation*}
+%         \begin{equation*}
+%         \begin{split}
+%             c \triangleq \oplus \:\{ & mult:\;!Int.!Int.?Int.end \\
+%             & div:\;!Int.!Int.?Int.end \\
+%             & eq: \;!Int.!Int.?Bool.end \} \\
+%         \end{split}
+%     \end{equation*}
+%     \noindent\rule{12cm}{0.8pt}
+%     \caption{Server and client example; session types definition}
+%     \label{fig:servertypes}
+% \end{figure}
+% \begin{figure}[h]
+%     \centering
+%     \begin{equation*}
+%         \begin{split}
+%             server \triangleq x \vartriangleright \: \{ & mult:\;x?(v_1).x?(v_2).x! \langle v_1 \times v_2 \rangle.0 \\
+%             & div:\;x?(v_1).x?(v_2).x!\langle v_1 \div v_2 \rangle.0 \\
+%             & eq: \;x?(v_1).x?(v_1).x!\langle v_1 == v_2 \rangle.0 \} \\
+%         \end{split}
+%     \end{equation*}
+%     \begin{equation*}
+%         \begin{split}
+%             client \triangleq y \vartriangleleft \:\{ & mult:\;y!\langle v_1 \rangle.y!\langle v_2 \rangle.x?(v_3).0 \\
+%             & div:\;y!\langle v_1 \rangle.y!\langle v_2 \rangle.y?(v_3).0 \\
+%             & eq: \;y!\langle v_1 \rangle.y!\langle v_2 \rangle.y?(v_3).0 \} \\
+%         \end{split}
+%     \end{equation*}
+%     \noindent\rule{12cm}{0.8pt}
+%     \caption{Server and client example; process definition}
+%     \label{fig:procserver}
+% \end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin{align*}
+        \begin{split}
+            srv \triangleq \& \:\{ & mult:\;?Int.?Int.!Int.end \\
+            & div:\;?Int.?Int.!Int.end \\
+            & eq: \;?Int.?Int.!Bool.end \} \\
+        \end{split}
+        \begin{split}
+            cl \triangleq \oplus \:\{ & mult:\;!Int.!Int.?Int.end \\
+            & div:\;!Int.!Int.?Int.end \\
+            & eq: \;!Int.!Int.?Bool.end \} \\
+        \end{split}
+    \end{align*}    
+    \noindent\rule{12cm}{0.8pt}
+    \begin{align*}
+        \begin{split}
+            server \triangleq x \vartriangleright \: \{ & mult:\;x?(v_1).x?(v_2).x! \langle v_1 \times v_2 \rangle.0 \\
+            & div:\;x?(v_1).x?(v_2).x!\langle v_1 \div v_2 \rangle.0 \\
+            & eq: \;x?(v_1).x?(v_1).x!\langle v_1 == v_2 \rangle.0 \} \\
+        \end{split}
+        \begin{split}
+            client \triangleq y \vartriangleleft \:\{ & mult:\;y!\langle v_1 \rangle.y!\langle v_2 \rangle.x?(v_3).0 \\
+            & div:\;y!\langle v_1 \rangle.y!\langle v_2 \rangle.y?(v_3).0 \\
+            & eq: \;y!\langle v_1 \rangle.y!\langle v_2 \rangle.y?(v_3).0 \} \\
+        \end{split}
+    \end{align*}
+    \caption{Server and Client example; above the line are the session types and below is the related processes}
+    \label{fig:clientServerExample1}
+\end{figure}
+
+When composed as process $\boldsymbol{(\nu xy) (server \;|\; client)}$ server and client can communicate on session endpoints $\boldsymbol{x, y}$ with corresponding types as in the figure above. 
+
+The $\pi$-calculus presented is very simple but incredibly powerful in modelling complex systems. $\pi$-calculus is always open for extension, such as presented in \citep{sangiorgi2003pi}, where higher-order types can implement lambda functions. 
+
+\subsection{Typing Rules}
+
+We use typing context $\boldsymbol{\Gamma}$ to denote the partial function that maps names to types. For a process $P$ to be well-typed, $\boldsymbol{\Gamma}$ must type every variable in $P$ denoted $\boldsymbol{\Gamma \vdash P}$ reading "$P$ is well-typed in typing context $\Gamma$". To type a specific variable $x$ of type $T$ that is denoted $\boldsymbol{\Gamma \vdash x : T}$ which should be read as "value $v$ is of type $T$ in typing context $\Gamma$". 
+
+\subsubsection{Linearity} We deal with linearity using the \textit{context split operator} \cite{vasconcelos2012fundamentals} denoted $\circ$. Linearity is a crucial part of session typed communication, as central to the theorem is that \textit{only} the communicating parties know the existence of channel endpoint. An unrestricted channel can be \textit{shared} among many parties; often, it is referred to as a \textit{shared channel}.
+
+\begin{figure}[h]
+    \centering
+    \begin{equation*}
+        \begin{split}
+            lin(T) \;&\; \text{if T is a session type and } T \not = end \\
+            un(T) \;&\; \text{otherwise} \\
+            lin(\Gamma) \;&\; \text{if there is } (x:T)\in \Gamma \text{ such that } lin(T) \\
+            un(\Gamma) \;&\; \text{otherwise} \\
+        \end{split}
+    \end{equation*}
+    \noindent\rule{12cm}{0.8pt}
+
+    % \begin{equation*}
+    %     \begin{split}
+    %         \begin{split}
+    %             \begin{gathered}
+    %                 \inferrule{ }{\emptyset = \emptyset \circ \emptyset} \\
+    %                 \inferrule{\Gamma = \Gamma \circ \Gamma \\ un(T)}{\Gamma, x : T = (\Gamma_1, x:T) \circ (\Gamma_2, x:T)} \:\:\\
+    %                 \end{gathered}
+    %         \end{split}
+    %         \begin{split}
+    %             \begin{gathered}
+    %                 \inferrule{\Gamma = \Gamma_1 \circ \Gamma_2 \\ lin(S)}{\Gamma, x : S = (\Gamma_1, x:S) \circ \Gamma_2} \\
+    %                 \inferrule{\Gamma = \Gamma_1 \circ \Gamma_2 \\ lin(S)}{\Gamma, x:S = \Gamma_1 \circ (\Gamma_2, x:S)}\\
+    %                 \end{gathered}
+    %         \end{split}
+    %     \end{split}
+    % \end{equation*}
+    \begin{align*}
+        \begin{split}
+            \inferrule{ }{\emptyset = \emptyset \circ \emptyset} \\
+            \inferrule{\Gamma = \Gamma \circ \Gamma \\ un(T)}{\Gamma, x : T = (\Gamma_1, x:T) \circ (\Gamma_2, x:T)}
+        \end{split}
+        \begin{split}
+            \inferrule{\Gamma = \Gamma_1 \circ \Gamma_2 \\ lin(S)}{\Gamma, x : S = (\Gamma_1, x:S) \circ \Gamma_2} \\
+            \inferrule{\Gamma = \Gamma_1 \circ \Gamma_2 \\ lin(S)}{\Gamma, x:S = \Gamma_1 \circ (\Gamma_2, x:S)}
+        \end{split}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Linearity and unrestricted predicates, and the context split operator for session types adapted from \citep{dardha2017session}}
+    \label{fig:contextsplit}
+\end{figure}
+
+
+The top of \autoref{fig:contextsplit} defines the linearity and unrestricted predicates, stating that a type $T$ is linear if it is a session type, and $\Gamma$ is linear if it contains a term $x$ which is a session typed process. The bottom of \autoref{fig:contextsplit} shows the context split operator, which states that an unrestricted name is shared across multiple contexts, and a linear name is separated such that it only occurs in one of the typing contexts.
+
+\subsubsection{Typing} We present the typing rules for the session typed $\pi$-calculus in Figure \ref{fig:typingSes}. We construct these typing rules using \textbf{typing judgements}; typing judgements take the form:
+\begin{equation*}
+    \inferrule{Premise}{Conclusion}
+\end{equation*}
+
+Reading "Premise implies Conclusion". For example, these are used to state that some variable(s) are well-typed in a process under some typing context. A typing judgement with no premise is an \textbf{axiom} on which every other typing judgement is built. 
+
+\subsubsection{Typing Rules} The typing rules for the session typed $\pi$-calculus are presented in \autoref{fig:typingSes}.
+
+\begin{figure}[h]
+    \centering
+        \begin{align*}
+            &\inferrule[(T-Var)]{un(\Gamma)}{\Gamma, x:T \vdash x:T} &
+            &\inferrule[(T-Val)]{un(\Gamma)}{\Gamma \vdash \star : Unit} &
+            &\inferrule[(T-Inact)]{un(\Gamma)}{\Gamma \vdash 0} &
+            &\inferrule[(T-Par)]{\Gamma_1 \vdash P \\ \Gamma_2 \vdash Q}{\Gamma_1 \circ \Gamma_2 \vdash P \; | \; Q} 
+        \end{align*}
+        \vspace{-10pt}
+        \begin{align*}
+            &\inferrule[(T-Res)]{\Gamma, x:T, y:\overline{T} \vdash P}{\Gamma \vdash (\nu xy)P} &
+            &\inferrule[(T-StndRes)]{\Gamma, x:T \vdash P \\ T \text{ is not a session type}}{\Gamma \vdash (\nu x) P}
+        \end{align*}
+        \vspace{-10pt}
+        \begin{align*}
+            &\inferrule[(T-In)]{\Gamma_1 \vdash x:?T.S \\ \Gamma_2, x:S, y:T \vdash P}{\Gamma_1 \circ \Gamma_2 \vdash x?(y).P} &
+            &\inferrule[(T-StndIn)]{\Gamma_1 \vdash x : \#T \\ \Gamma_2, x:\#T, y:T \vdash P}{\Gamma_1 \circ \Gamma_2 \vdash x?(y).P} 
+        \end{align*}
+        \vspace{-10pt}
+        \begin{align*}
+            &\inferrule[(T-Out)]{\Gamma_1 \vdash x:!T.S \\ \Gamma_2 \vdash v:T \\ \Gamma_3, x:S \vdash P}{\Gamma_1 \circ \Gamma_2 \circ \Gamma_3 \vdash x!\langle v \rangle.P} &
+            & \inferrule[(T-StndOut)]{\Gamma_1 \vdash x:\#T \\ \Gamma_2 \vdash v:T \\ \Gamma_3, x:\#T \vdash P}{\Gamma_1 \circ \Gamma_2 \circ \Gamma_3 \vdash x!\langle v \rangle.P}\\
+        \end{align*}
+        \vspace{-35pt}
+        \begin{align*}
+            & \inferrule[(T-Brch)]{\Gamma_1 \vdash x:\&\{ l_i : T_i \}_{i \in I} \\ \Gamma_2, x:T_i \vdash P_i \\ \forall i \in I}{\Gamma_1 \circ \Gamma_2 \vdash x \vartriangleright \{l_i : P_i \}_{i \in I}} & 
+            & \inferrule[(T-Sel)]{\Gamma_1 \vdash x : \oplus \{l_i : T_i\}_{i \in I} \\ \Gamma_2, x:T_j \vdash P \\ \exists j \in I}{\Gamma_1 \circ \Gamma_2 \vdash x \vartriangleleft l_j.P} \\
+        \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Typing rules for the session typed $\pi$-calculus adapted from \citep{dardha2017session}}
+    \label{fig:typingSes}
+\end{figure}
+
+The typing rules follow a similar shape; if a typing context $\Gamma$ is unrestricted, then simply the context that types variables is true for some name and type $T$. If the value is a unit value, then the same holds, and similarly for the inaction process. 
+
+Parallel composition \textbf{(T-Par)} uses the context split operator to type check both $P$ and $Q$ in separated contexts $\Gamma_1$ and $\Gamma_2$. A session restriction \textbf{(T-Res)} is well typed if $x : T$ and $y$ is it's dual, intuitively this holds as by the rules of duality displayed in \autoref{fig:dualses} for a session process to continue one endpoint must have the capability to output and the other to receive. Standard restriction \textbf{(T-StndRes)} is simply the well typed variable $x$ is now associated with the local scope of process $P$. If $x$ is typed as a session type $?T.S$ \textbf{(T-In)} in context $\Gamma_1$ then the context that type checks $P$, $\Gamma_2$, must be well typed when augmented with the continuation type $S$, and updated with the value received $T$. Similarly for standard input \textbf{(T-StndIn)} $x$ must be a channel type, and continuation process $P$ must hold when $x$ receives value $y:T$. When $x$ is typed with session type $!T.S$ \textbf{(T-Out)} then there exists $\Gamma_2$ that type checks variable $v$ and $\Gamma_3$ that type checks continuation process $P$ augmented with $x : S$. \textbf{(T-StndOut)} follows a similar shape to (T-Out) and (T-StndIn). Process $x$ is well typed as a branching process \textbf{(T-Brch)} when $x : \&\{ l_i : P_i \}$ and for every $i$ in the indexing set $I$, $x$ is well typed with type $T_i$ in process $P_i$. Finally process $x$ is a well typed selection process \textbf{(T-Sel)} when $x : \oplus \{ l_i : T_i \}_{i \in I}$ and for some $j$ in the indexing set $I$, $x$ is well typed with type $T_j$.
+% \todo{Explain the typing rules will hopefully make it typeset better}
+
+
+
+  \subsection{Operational Semantics}
+% We say that the bound names and free names (denoted $bn(\alpha)$ or $fn(\alpha)$ respectively) of an action $\alpha$. We use $n(\alpha) = fn(\alpha) \cup bn(\alpha)$.
+% An early LTS is introduced for proofs related with bisimulation. Introducing an early LTS allows the observation of process behaviour within their environment. As mentioned by \cite{Rom}
+
+\subsubsection{Free and Bound Names} 
+To be more explicit about the use of names, we will give a brief example to demonstrate the use of free and bound names:
+
+We use the $\boldsymbol \nu$ operator to bind names in processes. If a name is bound in $P$, then only the processes within the local scope, which we denote as $(...)$, can use the channel. Otherwise, if a name is not bound, then it is a free name known to the global scope of processes. To illustrate this, we show a simple example:
+
+\begin{equation*}
+    P \equiv \boldsymbol{(\nu x)} (\boldsymbol{x}!\langle v \rangle.\boldsymbol{x}?(y).0 \:|\: \boldsymbol{x}?(w).w!\langle \boldsymbol{x} \rangle.0) \:|\: v?(c).c!\langle a \rangle.0
+\end{equation*}
+
+We introduce the functions $fn(\alpha)$ and $bn(\alpha)$ which return the free names and bound names of term $\alpha$ respectively furthermore we state $n(\alpha) = fn(\alpha) \cup bn(\alpha)$. In this example $fn(P) = \{w, v, c\}$ and $bn(P) = \{x\}$. Initially only the processes contained within the local scope of $x$ can communicate, and the outer process cannot perform any action as it is under an input prefix. 
+
+
+\subsubsection{Reduction Relation}
+We define the reduction relation (denoted $\boldsymbol{\rightarrow}$) \cite{cantini1996logical} as the smallest binary relation that satisfy the operational semantics of the proof system (for clarity, the session typed $\pi$-calculus reductions hold by the rules specified in \autoref{fig:reductionSess}). 
+
+
+\subsubsection{Operational Semantics}
+
+To further illustrate the example above, we need to introduce the message-passing communication steps we will refer to as reductions.
+
+\begin{figure}[h]
+    \centering
+    \begin{align*}
+        \begin{split}
+            \textsc{(R-StndCom)} \hspace{20pt}& x!\langle v \rangle.P \: | \: x?(z).Q \rightarrow P \: | \: Q\{v/z\}\\
+            \textsc{(R-Com)} \hspace{20pt}& (\nu xy)(x!\langle v \rangle.P \: | \: y?(z).Q) \rightarrow (\nu xy)(P \: | \: Q\{v/z\}) \\
+            \textsc{(R-Case)} \hspace{20pt}& (\nu xy)(x \vartriangleleft l_j.P \: | \: y \vartriangleright \{ l_i : P_i \}_{i\in I}) \rightarrow (\nu xy)(P \: | \: P_j) \:\:\: j \in I \\
+            \textsc{(R-StndRes)} \hspace{20pt}& P \rightarrow Q \implies (\nu x) P \rightarrow (\nu x) Q \\
+            \textsc{(R-Res)} \hspace{20pt}& P \rightarrow Q \implies (\nu xy) P \rightarrow (\nu xy) Q \\
+            \textsc{(R-Par)} \hspace{20pt}& P \rightarrow Q \implies P \: | \: R \rightarrow Q \: | \: R \\
+            \textsc{(R-Struct)} \hspace{20pt}& P \equiv P', P \rightarrow Q, Q' \equiv Q \implies P' \rightarrow Q'
+        \end{split}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Operational semantics for the session typed $\pi$-calculus}
+    \label{fig:reductionSess}
+\end{figure}
+
+We will denote the substitution of a name $y$ by $x$ in $P$ as $P\{x/y\}$. Returning to the basic example, we can further elaborate on the use of bound names. 
+
+\begin{equation*}
+    \begin{split}
+        P \equiv \:& (\nu x) (x!\langle v \rangle.x?(y).0 \:|\: x?(w).w!\langle x \rangle.0) \:|\: v?(c).c!\langle a \rangle.0 \\
+        \rightarrow \:& (\nu x) (x?(y).0 \: | \: v!\langle x \rangle.0 \{v/w\}) \: | \: v?(c).c!\langle a \rangle.0 \\
+        \rightarrow \:& (\nu x) (x?(y).0 \: | \: 0 \: | \: x!\langle a \rangle.0\{x/c\} ) \\
+        \rightarrow \: & (\nu x) (0 \{y/a\} \: | \: 0 \: | \: | \:0 ) \\
+        \equiv \: & 0
+    \end{split}
+\end{equation*}
+
+We can see that $x$ is used in communication initially only within the local scope covering the first two terms, then the bound name $x$ is "discovered" by the final term such that the local scope \textit{expands} to include this term and allow the final communication step. The equation's final statement motivates the introduction \textit{structural congruence}.
+
+\subsubsection{Structural Congruence}
+We denote \textit{structural congruence} $\equiv$, as the smallest congruence on processes that satisfy the axioms in Figure \ref{fig:congSes}. 
+
+\begin{figure}[h]
+    \centering
+    \begin{equation*}
+        \begin{split}
+            P \; | \; Q & \equiv Q \; | \; P \\
+            P \; | \; (R \; | \; Q) & \equiv (P \; | \; R) \; | \; Q \\
+            P \; | \; 0 & \equiv P\\
+            (\nu xy) 0 & \equiv 0\\
+            (\nu x) 0 & \equiv 0\\
+            (\nu xy) (\nu zw) P & \equiv (\nu zw) (\nu xy) P\\
+            (\nu x) P \; | \; Q & \equiv (\nu x) (P \; | \; Q) (x \not \in fn(Q) )\\
+            (\nu xy) P \; | \; Q & \equiv (\nu xy) (P \; | \; Q) (x,y \not \in fn(Q))
+        \end{split}
+    \end{equation*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Structural Congruence rules for the session typed $\pi$-calculus adapted from \citep{dardha2017session}}
+    \label{fig:congSes}
+\end{figure}
+
+These assert that processes are commutative and associative and that the inaction process ($0$) can be "garbage collected" as it is a neutral element. The final rules introduce the notion of scope extrusion (or expansion), as discussed in \citep{sangiorgi2003pi}, this represents the fact that processes can pass around and use bound names within the scope to reduce to a new process, but this name cannot communicate with any process outside this scope. If $P \equiv Q$ then $Q$ is obtainable by 0 or more renamings of $\alpha$-convertible names. 
+
+We return to the $server$ and $client$ example in \autoref{fig:svclreduc} to demonstrate the use of these rules. We can see in the example that $x$ branches according to the label $mult$ sent by $y$. $v_1$ is substituted with value 2, and $v_2$ with 3. We assume a multiplication operator accepts two integers and returns their product. This result is sent on $x$ and is substituted in $v_3$ on the client-side, to which the process reduces to a point where no further reductions are possible, and the garbage collection structural congruence rule is applied to conclude with the inaction process.
+
+\begin{figure}[h]
+    \centering
+    \begin{equation*}
+    \begin{split}
+        \begin{split}
+            (\nu xy)(server\;|\;client) \triangleq & (\nu xy) (x \vartriangleright \{mult:... div:... eq:...\} \; | \; y \vartriangleleft mult.y!\langle 2 \rangle.y!\langle 3 \rangle.y?(v_3) ) \\
+            & \xrightarrow{\tau} (\nu xy) (x?(v_1).x?(v_2).x!\langle v_1 \times v_2 \rangle.0 \; | \; y!\langle 2 \rangle.y!\langle 3 \rangle.y?(v_3).0)\\
+            &\xrightarrow{\tau} (\nu xy) (x?(v_2).x!\langle 2 \times v_2 \rangle.0\{2/v_1\} \; | \; y!\langle 3 \rangle.y?(v_3).0)\\
+            &\xrightarrow{\tau} (\nu xy) (x!\langle 2 \times 3 \rangle.0\{3/v_2\} \; | \; y?(v_3).0)\\
+            &\xrightarrow{\tau} (\nu xy) (0 \; | \; 0\{6/v_3\})\\
+            & \equiv 0
+        \end{split}
+        \begin{split}
+            & \\
+            & (R-Case) \\
+            & (R-Com) \\
+            & (R-Com) \\
+            & (R-Com) \\
+            & \\ 
+        \end{split}
+    \end{split}
+    \end{equation*}
+    \caption{Server and Client example; Operational semantics and structural congruence rules applied. R-Case $\rightarrow$ R-Com $\rightarrow$ R-Com $\rightarrow$ R-Com $\equiv$ Garbage Collection}
+    \label{fig:svclreduc}
+\end{figure}
+
+% We define a context intuitively as a process with a hole. We will use $C$ to range over the contexts defined as 
+% \begin{equation*}
+%     C = [.] \; | \; x!\langle v \rangle.[.] \; | \; x?(y).[.] \; | \; x \vartriangleleft l_y.[.] \; | \; x \vartriangleright \{l_i : P_i \}.[.] 
+% \end{equation*}
+
+% \todo{May need to revise the context definition. Try find the paper where they define contexts like this. polyadic pi calculus}
+
+\section{Linear Types} \label{LinearTypes}
+
+Linear types originally introduced by \citep{kobayashi1999linearity} and developed further by \citep{sangiorgi2003pi} which \citep{dardha2017session} adapted to create the encoding, which we will explore later. The standard typed $\pi$-calculus with linear types uses linear types to define channels that can be used exactly once for either input or output or the combination of them both. The purpose of linear types is to control the system's resources directly; in this case, the resources we will be controlling is names. As we will explore later the channel types that linear typing imposes are the linear output channel ($l_i[\widetilde{\tau}]$), linear input channel ($l_o[\widetilde{\tau}]$) and the linear connection type ($l\#[\widetilde{\tau}]$). Intuitively these channels can only be used once for output, once for output or the union of both input and output, respectively. The channel type is shown in \autoref{fig:combLin} and can send and receive exactly once. We use the tilde \textasciitilde \hspace{1pt} to represent a sequence of elements. 
+
+\begin{figure}[h]
+    \centering
+    \begin{align*}
+        \begin{split}
+            \tau ::= & l_o[\widetilde{\tau}] \\
+            & l_i[\widetilde{\tau}] \\
+            & l_\#[\widetilde{\tau}] \\
+            & \emptyset[]
+        \end{split}
+        &
+        \begin{split}
+            & \text{(linear output)} \\
+            & \text{(linear input)} \\
+            & \text{(linear connection)} \\
+            & \text{(no capability)}
+        \end{split}
+        & 
+        \begin{split}
+            & \#[\widetilde{\tau}]\\
+            & \langle l_i\_\tau_i\rangle_{i \in I}\\
+            & Unit \\
+            & ...
+        \end{split}
+        &
+        \begin{split}
+            & \text{(connection)} \\
+            & \text{(variant type)} \\
+            & \text{(unit type)} \\
+            & \text{(other constructs)}
+        \end{split}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \begin{align*}
+        \begin{split}
+            P, Q :== & x!\langle \widetilde{v} \rangle.P \\
+            & x?(y).P\\
+            & (\nu x) P \\[10pt]
+            v :== & x \\
+            & l\_v
+        \end{split}
+        &
+        \begin{split}
+            &\text{(output)} \\
+            &\text{(input)} \\
+            &\text{(restriction)} \\[10pt]
+            &\text{(name)} \\
+            &\text{(variant value)} 
+        \end{split}
+        & 
+        \begin{split}
+            & 0 \\
+            & P \; | \; Q \\
+            & \text{case } v \text{ of } \{l_i\_(x_i) \vartriangleright P_i\}_{i \in I}\\[10pt]
+            & \star \\
+            & 
+        \end{split}
+        &
+        \begin{split}
+            &\text{(inaction)} \\
+            &\text{(composition)} \\
+            &\text{(case)} \\[10pt]
+            &\text{(unit value)} \\
+            &
+        \end{split}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Syntax of types and process for the standard typed $\pi$-calculus adapted from \citep{dardha2017session}}
+    \label{fig:lintypesSyntax}
+\end{figure}
+
+\subsubsection{Variant Values} A new construct that is introduced in the standard typed $\pi$-calculus is the \textit{variant value} which is a disjoint union of \textbf{values} mapping to \textbf{types}. Variant values \textit{select} continuation processes in a case statement. This is the equivalent of branch and select in the session typed $\pi$-calculus.
+
+% \begin{figure}[h]
+%     \centering
+%     \begin{align*}
+%         \begin{split}
+%             P, Q :== & x!\langle \widetilde{v} \rangle.P \\
+%             & x?(y).P\\
+%             & (\nu x) P \\[10pt]
+%             v :== & x \\
+%             & l\_v
+%         \end{split}
+%         &
+%         \begin{split}
+%             &\text{(output)} \\
+%             &\text{(input)} \\
+%             &\text{(restriction)} \\[10pt]
+%             &\text{(name)} \\
+%             &\text{(variant value)} 
+%         \end{split}
+%         & 
+%         \begin{split}
+%             & 0 \\
+%             & P \; | \; Q \\
+%             & \text{case } v \text{ of } \{l_i\_(x_i) \vartriangleright P_i\}_{i \in I}\\[10pt]
+%             & \star \\
+%             & 
+%         \end{split}
+%         &
+%         \begin{split}
+%             &\text{(inaction)} \\
+%             &\text{(composition)} \\
+%             &\text{(case)} \\[10pt]
+%             &\text{(unit value)} \\
+%             &
+%         \end{split}
+%     \end{align*}
+%     \noindent\rule{12cm}{0.8pt}
+%     \caption{Syntax of processes for the standard typed $\pi$-calculus adapted from \cite{dardha2017session}}
+%     \label{fig:linprocSyntax}
+% \end{figure}
+
+\subsubsection{Duality}
+
+To highlight the functionality with session typed $\pi$-calculus, we introduce the notion of duality on linear types. Duality is crucial as we want to enforce that processes when type-checked have opposite or polar capabilities. As discussed in \citep{kobayashi1999linearity} Linear types not only have "polarities" which determine the direction of communication, but also \textit{multiplicities} which determine the number of times a channel will function.
+
+\begin{figure}[h]
+    \centering
+    \begin{equation*}
+        \begin{split}
+            \overline{l_i[\widetilde{\tau}]} \triangleq & \:l_o[\widetilde{\tau}] \\
+            \overline{l_o[\widetilde{\tau}]} \triangleq & \:l_i[\widetilde{\tau}] \\
+            \overline{\emptyset[]} \triangleq & \:\emptyset[]
+        \end{split}
+    \end{equation*}
+    \noindent\rule{12cm}{0.8pt}
+    \begin{align*}
+        \begin{split}
+            lin(\tau) \:\: & \text{if } \tau = l_\alpha[\widetilde{\tau}] \text{ or } (\tau = \langle l_i\_\tau_i \rangle_{i \in I} \text{and for some } j \in I. \: lin(\tau_j)) \\
+            un(\tau) \:\:& otherwise\\
+            lin(\Gamma) \:\:& \text{if there is } (x : \tau) \in \Gamma \text{ such that } lin(\tau)\\
+            un(\Gamma) \:\:& otherwise 
+        \end{split}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Linearity and unrestricted predicates and duality capabilities for the standard $\pi$-calculus types}
+    \label{fig:linDualLinpi}
+\end{figure}
+
+The combination operator $\uplus$ is used to combine the types of multiple type environments. $\Gamma_1 \uplus \Gamma_2$ can only be defined if $\Gamma_1(x)$ and $\Gamma_2(x)$ have opposite capabilities. The combination operator is formally defined in Figure \ref{fig:combLin}.
+
+\begin{figure}[h]
+    \centering
+    \begin{equation*}
+        \begin{split}
+            l_i[\widetilde{\tau}] \uplus l_o[\widetilde{\tau}] & \triangleq l_\#[\widetilde{\tau}] \\
+            \tau \uplus \tau & \triangleq \tau  \\
+            \tau \uplus \tau' & \triangleq undef 
+        \end{split}
+        \begin{split}
+            & \\
+            & \text{ if } un(\tau) \\
+            & \text{ otherwise}
+        \end{split}
+    \end{equation*}
+    \caption{Combination $\uplus$ operator adapted from \citep{dardha2017session}}
+    \label{fig:combLin} 
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin{align*}
+        \begin{split}
+            (\Gamma_1 \uplus \Gamma_2) \doteq & 
+        \end{split}
+        &
+        \begin{split}
+            & \Gamma_1 (x) \uplus \Gamma_2 (x) \\
+            & \Gamma_1(x) \\
+            & \Gamma_2(x) \\
+            & undef 
+        \end{split}
+        \begin{split}
+            & \text{ if both } \Gamma_1 (x) \text{ and } \Gamma_2 (x) \text{ are defined} \\
+            & \text{ if } \Gamma_1 (x) \text{, but not } \Gamma_2 (x) \text{, is defined} \\
+            & \text{ if } \Gamma_2 (x) \text{, but not } \Gamma_1 (x) \text{, is defined} \\
+            &\:\: otherwise
+        \end{split}
+    \end{align*}
+    \caption{Context combination for linear types in the standard typed $\pi$-calculus adapted from \citep{dardha2017session}}
+    \label{fig:contextComb}
+\end{figure}
+
+
+\subsection{Typing Rules}
+The typing rules for the standard $\pi$-calculus has a very similar shape to those of the session typed $\pi$-calculus defined in Figure \ref{fig:typingLin}. 
+
+\begin{figure}[h]
+    \centering
+        \begin{align*}
+            &\inferrule[(T$\pi$-Var)]{un(\Gamma)}{\Gamma, x:T \vdash x:T} &
+            &\inferrule[(T$\pi$-Val)]{un(\Gamma)}{\Gamma \vdash \star : Unit} &
+            &\inferrule[(T$\pi$-Inact)]{un(\Gamma)}{\Gamma \vdash 0} 
+        \end{align*}
+        \vspace{-10pt}
+        \begin{align*}
+            &\inferrule[(T$\pi$-Par)]{\Gamma_1 \vdash P \\ \Gamma_2 \vdash Q}{\Gamma_1 \uplus \Gamma_2 \vdash P \; | \; Q} 
+            &\inferrule[(T$\pi$-Res1)]{\Gamma, x:l_\#[\widetilde{\tau}] \vdash P}{\Gamma \vdash (\nu x)P} &
+            &\inferrule[(T$\pi$-Res2)]{\Gamma, x:\emptyset[] \vdash P }{\Gamma \vdash (\nu x) P}
+        \end{align*}
+        \vspace{-10pt}
+        \begin{align*}
+            &\inferrule[(T$\pi$-Inp)]{\Gamma_1 \vdash x:l_i[\widetilde{\tau}] \\ \Gamma_2, y:\widetilde{\tau} \vdash P}{\Gamma_1 \uplus \Gamma_2 \vdash x?(\widetilde{y}).P} &
+            &\inferrule[(T$\pi$-Out)]{\Gamma_1 \vdash x : l_o[\widetilde{\tau}] \\ \widetilde{\Gamma_2} \vdash \widetilde{v} : \widetilde{\tau} \\ \Gamma_3 \vdash P}{\Gamma_1 \uplus \Gamma_2 \uplus \Gamma_3 \vdash x!\langle \widetilde{v} \rangle.P} 
+        \end{align*}
+        \vspace{-10pt}
+        \begin{align*}
+            &\inferrule[(T$\pi$-LVal)]{\Gamma_1 \vdash v:\tau_j \\ j \in I}{\Gamma \vdash l_j\_v : \langle l_i\_\tau_i \rangle_{i \in I}} &
+            & \inferrule[(T$\pi$-Case)]{\Gamma_1 \vdash v:\langle l_i\_\tau_i \rangle_{i \in I} \\ \Gamma_2, x_i : \tau_i \vdash P_i \\ \forall i \in I}{\Gamma_1 \uplus \Gamma_2 \vdash \text{case } v \text{ of } \{l_i\_(x_i) \vartriangleright P_i\}_{i \in I}}
+        \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Typing rules for the standard typed $\pi$-calculus adapted from \citep{dardha2017session}}
+    \label{fig:typingLin}
+\end{figure}
+
+We use the notation $\widetilde{\Gamma}$ to denote the combination of context such that $\widetilde{\Gamma} = \Gamma_1 \uplus \Gamma_2 \uplus ... \uplus \Gamma_k$
+
+\textsc{T$\pi$-Var}, \textsc{T$\pi$-Val}, \textsc{T$\pi$-Inact} are defined in the same manner as described before. Parallel composition is defined as the combination of typing contexts that type both the processes $P$ and $Q$. Session restriction as defined by \textsc{(T$\pi$-Res1)} and \textsc{(T$\pi$-Res1)} states that $x$ must be a linear channel type or a channel with no capabilities.  Input defined by \textsc{(T$\pi$-Inp)} states that $x$ must be a linear input channel and that $\widetilde{y}$ is compatible with the carried type. Output, as defined by \textsc{(T$\pi$-Out)}, is similar to input with the addition that the continuation process is typed with a different context. A notable typing rule to mention is the introduction of the variant value defined in \textsc{(T$\pi$-LVal)} where $lj\_v$ is typed as a variant type and value $v$ must be of type $\tau_j$ where $j$ is in  indexing set $I$. Case statements defined by \textsc{(T$\pi$-Case)} state that $v$ must be a variant value and $x_i$ must be of carried type $\tau_i$ in continuation process $P$. 
+
+\subsection{Operational Semantics}
+
+The operational semantics for the linearly typed $\pi$-calculus follow a similar shape to its counterpart. As is apparent by the typing rules, we have the difference that there are no defined branching and selection processes, rather just the \textit{case statement} and output processes. The variant value is used in this context to select processes as is shown in \autoref{fig:reductionLinear}.
+
+\begin{figure}[h]
+    \centering
+    \begin{align*}
+        \begin{split}
+            \textsc{(R$\pi$-Com)} & x!\langle \widetilde{v} \rangle.P \: | \: x?(\widetilde{z}).Q \rightarrow P \: | \: Q \{\widetilde{v} / \widetilde{z}\} \\
+            \textsc{(R$\pi$-Case)} & \text{case } l_j\_v \text{ of } \{l_i\_(x_i) \vartriangleright P_i\}_{i \in I} \rightarrow P_j\{v/x_j\} \hspace{3pt} j \in I\\
+            \textsc{(R$\pi$-Res)} & P \rightarrow Q \implies (\nu x) P \rightarrow (\nu x) Q \\
+            \textsc{(R$\pi$-Par)} & P \rightarrow Q \implies P \: | \: Q \rightarrow Q \: | \: R \\
+            \textsc{(R$\pi$-Struct)} & P \equiv P', P \rightarrow Q, Q' \equiv Q \implies P' \rightarrow Q'
+        \end{split}
+    \end{align*}
+    \caption{Operational semantics for the standard typed $\pi$-calculus with linear types}
+    \label{fig:reductionLinear}
+\end{figure}
+
+\section{Encoding} \label{Encoding}
+
+Session types guarantee communication privacy as it specifies that session endpoints are only available to two communicating parties, furthermore it must reflect the properties described above, ensuring that the duality of types is preserved. 
+
+Session types also specify that processes may communicate on session endpoint as many times as they want, then this needs to be reflected in the linear typed $\pi$-calculus. Therefore, the main difficulties come in when creating environments where communication can occur multiple times. As discussed before, linear channels are used only once, so intuitively this seems impossible. New fresh channels need to be created repeatedly for each channel use to overcome this. 
+
+We then employ the use of the \textit{continuation passing style} for the encoding, to create dual behaviour channels and send this with every output process. Continuation passing style (CPS) has applications in many different contexts, such as in the programming language Erlang. It entails passing program's control explicitly through a \textit{continuation}. 
+
+\begin{figure}[h]
+    \centering
+    \begin{align*}
+        \begin{split}
+            \llbracket end \rrbracket \triangleq \:&\: \emptyset[]\\
+            \llbracket !T.S \rrbracket \triangleq \:&\: l_o[\llbracket T \rrbracket, \llbracket \overline{S} \rrbracket]\\
+            \llbracket ?T.S \rrbracket \triangleq \:&\: l_i[\llbracket T \rrbracket, \llbracket S \rrbracket]\\
+            \llbracket \oplus \{ l_i : S_i \}_{i \in I} \rrbracket \triangleq \:&\: l_o[\langle l_i\_\llbracket \overline{S_i} \rrbracket \rangle_{i \in I}]\\
+            \llbracket \& \{ l_i : S_i \}_{i \in I} \rrbracket \triangleq \:&\: l_i[\langle l_i\_\llbracket S_i \rrbracket \rangle_{i \in I}]
+        \end{split}
+        \begin{split}
+            & (E-End) \\[2pt]
+            & (E-Out) \\[2pt]
+            & (E-Inp) \\[2pt]
+            & (E-Select) \\[2pt]
+            & (E-Branch)
+        \end{split}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \begin{equation*}
+        \begin{split}
+            \llbracket x \rrbracket_f & \triangleq f_x  \\
+            \llbracket \star \rrbracket_f & \triangleq \star \\
+            \llbracket 0 \rrbracket_f & \triangleq 0 \\
+            \llbracket x!\langle v \rangle.P \rrbracket_f & \triangleq (\nu c) f_{x!}\langle \llbracket v \rrbracket_f , c \rangle.\llbracket P \rrbracket_{f, \{ x \mapsto c \}} \\
+            \llbracket x?(y).P \rrbracket_f & \triangleq f_{x?}(y,  c).\llbracket P \rrbracket_{f, \{ x \mapsto c \}}\\
+            \llbracket x \vartriangleleft l_j.P \rrbracket_f & \triangleq (\nu c) f_{x!}\langle l_j\_c\rangle.\llbracket P \rrbracket_{f, \{ x \mapsto c\}}\\
+            \llbracket x \vartriangleright \{ l_i : P_i \}_{i \in I} \rrbracket_f & \triangleq f_{x?}(y). \text{case} \, y \, \text{of}\, \{li\_(c) \vartriangleright \llbracket P \rrbracket_{f, \{ x \mapsto c \}}\}_{i \in I}\\
+            \llbracket P \,|\, Q \rrbracket_f & \triangleq \llbracket P \rrbracket_f \, \llbracket Q \rrbracket_f \\
+            \llbracket (\nu xy)P \rrbracket & \triangleq (\nu c) \llbracket P \rrbracket_{f, \{ x, y \mapsto c\}}
+        \end{split}
+        \begin{split}
+            & \text{(E-Name)} \\
+            & \text{(E-Star)} \\
+            & \text{(E-Inaction)} \\
+            & \text{(E-Output)} \\
+            & \text{(E-Input)} \\
+            & \text{(E-Selection)} \\
+            & \text{(E-Branching)} \\
+            & \text{(E-Composition)} \\
+            & \text{(E-Restriction)}
+        \end{split}
+    \end{equation*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Encoding of types and terms adapted from \citep{dardha2017session}}
+    \label{fig:Encoding}
+\end{figure}
+
+\subsection{Type Encoding}
+
+The encoding of types is in Figure \ref{fig:Encoding}. $end$ encoded as the channel with no output or input capabilities. 
+
+$?T.S$ encoded as the linear input channel which can receive a pair of values, the first being the encoded type of $T$ and the second value being the type of the continuation process $S$. $!T.S$ encoded as the linear output channel which sends a pair of values, firstly the encoding of the original term sent $\llbracket T \rrbracket$, and the second value is the dual of the encoding of $S$. The motivation behind sending $\llbracket \overline{S} \rrbracket$ is such that the receiving process knows the capability the continuation process must-have for the receiving process, and not the continuation process that the sending process will have. This is more apparent when considering the type $!T.!T.end$ when encoded becomes $l_o[T, l_i[T, \emptyset[]]]$. The dual of this type $?T.?T.end$ becomes $l_i[T, l_i[T, \emptyset[]]]$ as the process receiving must be capable of receiving another $T$. 
+The branch and select processes are encoded similarly to the input and output types. Select is a linear output channel, that sends a variant value, and encodes the continuation process for the indexed label, such that $l_i$ has a corresponding continuation process type $S_i$ for all $i \in I$ with $I$ being the indexing set over processes. Select sends the dual type of the continuation process for the same reasoning as the output type.
+
+
+\subsection{Process Encoding}
+
+An important detail that is included in \citep{dardha2017session} is the introduction of a renaming function $f$. The renaming function that maps names to names is defined for $P$ if for all free names $x$ in $P$, the image $f_x$ is either the identity of $x$ or a fresh name not in $n(P)$. Intuitively $f$ is the identity function for all bound names in P. We denote the updating of the renaming function as $f, {x, y \mapsto c}$ where both $x, y$ are now associated with the name $c$ such that $f_x$ and $f_y$ both now return the name $c$. 
+
+We will return to the server and client example to emphasise this point and demonstrate how the encoding is applied, as well as showing how the renaming function will encode a session restriction. In the example, the names $x, y$ are session endpoints defined in session typed $\pi$-calculus and are renamed and bound to the fresh name $c$. From now on, we refer to the session typed $\pi$-calculus as $\pi^{session}$ and conversely, the standard typed $\pi$-calculus with linear types as $\pi^{linear}$.
+
+\begin{figure}[h]
+    \centering
+    \begin{align*}
+        \begin{split}
+            \llbracket S \rrbracket \triangleq \: l_i[\langle & mult\_l_i[Int, l_i[Int, l_o[Int, \emptyset[]]]],\\
+            & div\_l_i[Int, l_i[Int, l_o[Int, \emptyset[]]]],\\
+            & eq\_l_i[Int, l_i[Int, l_o[Bool, \emptyset[]]]] \rangle ] 
+        \end{split}
+    \end{align*}
+    \begin{align*}
+        \begin{split}
+            \llbracket \overline{S} \rrbracket \triangleq \: l_o[\langle & mult\_l_i[Int, l_i[Int, l_o[Int, \emptyset[]]]],\\
+            & div\_l_i[Int, l_i[Int, l_o[Int, \emptyset[]]]],\\
+            & eq\_l_i[Int, l_i[Int, l_o[Bool, \emptyset[]]]] \rangle ] 
+        \end{split}
+    \end{align*}
+    \caption{Server and client example; Encoding types as defined by \autoref{fig:Encoding}}
+    \label{fig:my_label}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{align*}
+        \llbracket (\nu xy)(server | client) \rrbracket \triangleq \:& (\nu z) \llbracket (server | client) \rrbracket_{f, \{x, y \mapsto z \}} \\
+        & (\nu z) (\llbracket server \rrbracket_{f\{x \mapsto z \}} | \llbracket client \rrbracket_{f, \{y \mapsto z \}}
+    \end{align*}
+    \begin{align*}
+        \llbracket server \rrbracket_{f, \{x \mapsto z\}} \triangleq \: & z?(y).\text{case } y \text{ of } \{ \\
+        & mult\_(s) \vartriangleright s?(v_1, c).c?(v_2, c').(\nu c'')c'!\langle v_1 \times v_2, c'' \rangle.0 \\
+        & div\_(s) \vartriangleright s?(v_1, c).c?(v_2, c').(\nu c'')c'!\langle v_1 \div v_2, c'' \rangle.0 \\
+        & eq\_(s) \vartriangleright s?(v_1, c).c?(v_2, c').(\nu c'')c'!\langle v_1 == v_2, c'' \rangle.0 \:\}
+    \end{align*}
+    \begin{align*}
+        \llbracket client \rrbracket_{f, \{y \mapsto z\}} \triangleq \: & (\nu s)z!\langle mult\_s \rangle.(\nu c)s!\langle 2, c \rangle.(\nu c')c!\langle 3, c' \rangle.c'?(mult, c'').0
+    \end{align*}
+    \caption{Server and client example; Encoding processes as defined by \autoref{fig:Encoding}}
+    \label{fig:encodeExample}
+\end{figure}
+
+We demonstrate how these processes reduce in a very similar manner to the original un-encoded example. The session endpoints $x, y$ renamed to the fresh name $z$ in the encoded version such that they can initiate a linear conversation of values. As defined in \autoref{fig:Encoding} the client creates the fresh name $s$, which will be sent to the server with the label $mult$. For every output, a fresh name is created and sent with every output, such that both processes have a new linear name to communicate on. We will demonstrate this conversation in \autoref{fig:encodedReduction}. 
+
+\begin{figure}[h]
+    \centering
+    \begin{align*} 
+        \llbracket (\nu xy) (server | client) \rrbracket \xrightarrow{\tau} & (\nu s) (\text{case } mult\_s \text{ of } \{...\} \: | \: (\nu c) s!\langle 2, c \rangle.(\nu c')c!\langle 3, c' \rangle.c'?(mult, c'').0) \\
+        \xrightarrow{\tau} \:& (\nu s) (s?(v_1, c).c?(v_2, c').(\nu c'')c'!\langle v_1 \times v_2, c'' \rangle.0 \:| \\
+        & \hspace{105pt}(\nu c) s!\langle 2, c \rangle.(\nu c')c!\langle 3, c' \rangle.c'?(mult, c'').0) \\
+        \xrightarrow{\tau} \:& (\nu c) (c?(v_2, c').(\nu c'')c'!\langle 2 \times v_2, c'' \rangle.0 \: | \: (\nu c') c!\langle 3, c' \rangle.c'?(mult, c'').0) \\
+        \xrightarrow{\tau} \:& (\nu c') ((\nu c'') c'!\langle 2 \times 3, c'' \rangle.0 | c'?(mult, c'').0) \\
+        \xrightarrow{\tau} \:& 0 \: | \: 0 \: \{6 / mult\} \equiv \:0
+    \end{align*}
+    \caption{Full reduction sequence of the encoded server and client example; Rules applied are: (R$\pi$-Close) $\rightarrow$ (R$\pi$-Case) $\rightarrow$ (R$\pi$-Com) $\rightarrow$ (R$\pi$-Com) $\rightarrow$ (R$\pi$-Com) $\equiv$ Garbage Collection.}
+    \label{fig:encodedReduction}
+\end{figure}
+
+% \todo{decide on the label to emit for case statements.}
+
+% \todo{look at stndres, think about whether the process would emit a label, or rather should it only be for if one process can reduce}
+
+
+% \section{$\pi$-Calculus by Example}
+% We can say two processes $P, Q$ can communicate with each other if they are "put in parallel" with each other denoted $P \;|\; Q$. We can consider these processes to be say, in the same namespace, however per this definition there is no direct method of communication. If we define process P as $x!(v).0$ reading "P can send value $v$ on name $x$ and then terminate"  and process Q as $x?(y).0$ reading "Q can receive a value on name $x$ and then continue with process $Q'$", then when composed with one another we get $x!(v).0 \; | \; x?(y).Q'$ which reduces to $\rightarrow Q{v/y}$ which reads as "process Q, with y substituted for v". 
+
+% Just as in the $\lambda$-calculus all free names in processes are $\alpha$-convertible unless they are bound in the process. Binding channels in the means that sequential computation can be enforced, and non-determinism can be avoided. A good example of this is to consider the process:
+% \begin{equation*}
+%     (a!\langle v \rangle.0 \: | \: a?(b).0 \: | \: a?(c).0 )
+% \end{equation*}
+
+% In this example, both processes $(a?(b).0)$ and $a?(c).0$ both have the capability to receive $v$ on $a$. We can represent this in a process trace: 
+
+% \Tree [.{a!\langle v\rangle} [.{a?(b)} 0 ] [.{a?(c)} 0 ] ] 
+
+% If we extend this example with a channel restriction, and also highlight that the values that can be sent on channels can also be channels themselves. We can therefore derive this example:
+
+% \todo{continue reading asynchronous testing paper}
+
+% \todo{discuss the fact that you cannot observe a channel that isn't outputting on free name, use reference of two side of the same coin}
+
+% \todo{move the pi calculus by example section to the end}
+
+% \todo{section on behavioural equivalences}
+
+% \todo{define the barbs and observations. Explain and describe strong and weak barbs}
+
+% \todo{put down all the lemmas n shit}
+
+% \todo{define contexts}
+
+% \todo{speak more about linearity}
+
+% \todo{Could talk about game semantics}
+
+% A Linear Account of Session Types in the Pi
+% Calculus
+
+% Sessions and Session Types: An Overview
+
+% Duality and i/o-Types in the $\pi$-Calculus
+
+% A brief survey of the theory of the Pi-calculus.
+
+\end{document}

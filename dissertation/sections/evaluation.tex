@@ -1,0 +1,203 @@
+\begin{document}
+In this section, the proofs for the Lemmas and Theorems stated in \autoref{implementation} are presented.
+
+\vspace{10pt}
+
+\textbf{Lemma \ref{Lem:ChannelRename}:}
+
+For all observable actions $\alpha$ if $P \downarrow_{\alpha}$ then $\llbracket P \rrbracket \downarrow_{f_\alpha}$
+
+\begin{proof}
+If $\Gamma \vdash_{session} P$ and $\llbracket \Gamma \rrbracket \vdash Q$ such that $Q = \llbracket P \rrbracket$ then $P \downarrow_\alpha$ iff $Q \downarrow_\alpha$ for some arbitrary channel name $\alpha$.
+
+Proof by structural induction on the encoding rules for $\pi^{session}$. We present the cases in which the observable actions $\alpha \not = \tau$.
+
+\begin{itemize}
+    \item Case E-Inaction: Assume $P \equiv 0$, then by \autoref{fig:Encoding} $Q \equiv 0$, no communication is possible and $P \not \rightarrow$.
+    \item Case E-Star: Assume $P \equiv \star$, then by \autoref{fig:Encoding} $Q \equiv \star$, no communication is possible and $P \not \rightarrow$.
+    \item Case E-Name: Assume $P \equiv x$, then by \autoref{fig:Encoding}, $Q \equiv f_x$. By the definition of the renaming function $f_x$ returns channel name $x$ and $P \not \rightarrow$.
+    \item Case E-Output: Assume $P \equiv x!\langle v \rangle$, by \autoref{fig:Encoding} $Q \equiv (\nu c) f_{x!}\langle \llbracket v \rrbracket_f , c \rangle$. As $x \not \in bn(Q)$ then $f_x$ returns $x$. We can review the relation $P$ $R$ $P'$ where $R$ is defined by \autoref{fig:sessLTS} such that $R = (P, \{x!\langle v \rangle \}, P')$. We define $R'$ such that $\llbracket P \rrbracket$ $R'$ $\llbracket P' \rrbracket$, by \autoref{fig:linLTS} we have $R' = (\llbracket P \rrbracket, f_{x!}\langle \llbracket v \rrbracket, c \rangle, \llbracket P' \rrbracket)$. Hence $P \downarrow_{x!}$ implies $\llbracket P \rrbracket_f \downarrow_{f_{x!}}$
+    \item Case E-Selection: Assume $P \equiv x \vartriangleleft l_j$ then by \autoref{fig:Encoding} $Q \equiv (\nu c)f_{x!} \langle l_j\_c \rangle$. $x \not \in bn(Q)$ then $f_{x!}$ returns $x$. We conclude as in the E-Output case.
+    \item Case E-Composition: Assume $P \equiv L \;|\; K$ then by \autoref{fig:Encoding} $Q \equiv \llbracket L  \rrbracket_f \; | \; \llbracket K \rrbracket_f$. If $L$ or $K$ is defined in terms of E-Branching or E-Input, then $P \not \downarrow_x$ as discussed previously. Otherwise it must follow one of the previous cases.
+    \item Case E-Restriction: Assume $P \equiv (\nu xy)K$ then by \autoref{fig:Encoding} $Q \equiv (\nu c) \llbracket K \rrbracket_{f, \{x, y \mapsto c\}}$. By \ref{def:bs} $P \not \downarrow_{x!}$ and $P \not \downarrow_{y!}$ as $\{x, y\} \in bn(P)$. $P \downarrow_{\alpha!}$ iff $K$ follows one of the previous cases and $\alpha \not \in bn(P)$ and hence $Q \downarrow_{f_{\alpha !}}$.
+\end{itemize}
+\end{proof}
+
+\vspace{10pt}
+
+
+\textbf{Lemma \ref{Lem:OperationalCorr}:}
+
+Let $P$ be a session process, $\Gamma$ a session typing context, $\alpha$ be the arbitrary set of observable actions and $f$ a renaming function for $P$ such that $\llbracket \Gamma \rrbracket_f \vdash \llbracket P \rrbracket_f$.
+    
+    \begin{enumerate}
+        \item If $P \xrightarrow{\alpha} P'$, then $\llbracket P \rrbracket_f \xrightarrow{\alpha}\hookrightarrow \llbracket P' \rrbracket_f$.
+        \item If $\llbracket P \rrbracket_f \xrightarrow{\alpha} Q$ then there is a session process $P'$ such that
+        \begin{itemize}
+            \item either $P \xrightarrow{\alpha} P'$;
+            \item or there are $x, y$ such that $(\nu xy)P \xrightarrow{\alpha} P'$ and $Q \hookrightarrow \llbracket P' \rrbracket_f$
+        \end{itemize}
+    \end{enumerate}
+
+Proof for this can be found in \citep{dardha2017session}.
+
+\vspace{10pt}
+
+
+\textbf{Lemma \ref{Lem:Definability}:}
+
+For all $P \in \pi^{linear}$, $\Gamma \in \pi^{session}$ such that $\llbracket \Gamma \rrbracket \vdash P$ exists $R \in \pi^{session}$ such that $\Gamma \vdash R$ and $P \simeq_{test} \llbracket R \rrbracket$
+
+\begin{proof}
+(Sketch)
+Proof by coinduction on the labelled transition of all processes $P \in \pi^{linear}$ such that $\Gamma \in \pi^{session}$, $\llbracket \Gamma \rrbracket \vdash P$
+
+% \item Case (R$\pi$-Output): We have that P \equiv a!\langle \widetilde{b} \rangle.R. By \autoref{fig:Encoding} we obtain $\llbracket \Gamma \rrbracket \vdash P$. We state that $\llbracket P \rrbracket$ has transition relation $R$ such that $R = (\llbracket P \rrbracket, f_{a!}\langle \llbracket v \rrbracket, c \rangle, \llbracket P' \rrbracket)$. We use Lemma \ref{Lem:OperationalCorr} to get $Q$ such that $P$ $R'$ $Q$ where $R'$ is the decoding relation. 
+
+Assume we have $\llbracket \Gamma \rrbracket \vdash P$ by induction hypothesis. We assert by Lemma \ref{Lem:OperationalCorr} that there must exist $Q$ such that $P$ $R$ $Q$ where $R$ is the encoding relation. We prove by coinduction on the typing rules of $\pi^{linear}$ that for all $P \in \pi^{linear}$ that the observable actions $\alpha$ are either a sequence $s$ of $\tau$ transitions such that $\llbracket P \rrbracket \xrightarrow{\tau}^* \llbracket P' \rrbracket$ where $\llbracket P' \rrbracket \not \rightarrow$. For all labelled transitions such that $\alpha$ is defined by the set $\{ \tau \}$ we present the observable actions of processes $Q$ where $\Gamma \vdash Q$ by coinduction on the typing rules of $\pi^{session}$ and state that the set of all observable actions is contained in the set $\{\tau\}$.
+
+We now study the typing rules for which the observable actions $\mu$ and $\tau \not \in \mu$. We perform coinduction on the typing rules of $\pi^{linear}$ with respect to the process $Q \in \pi^{session}$. We show the labelled transition relation contains the observable action $\mu$ and by Lemma \ref{Lem:ChannelRename} we assert that for every observable action in $\pi^{linear}$ there exists $Q$ by Lemma \ref{Lem:OperationalCorr} such that the relation $P$ $R'$ $Q$ is a subset, $R' \subseteq \sqsubseteq_{test}$. 
+
+As we do not change the behaviour of $P$ and $Q$ we can demonstrate that $R \subseteq \simeq_{test}$.
+
+ \end{proof}
+
+\vspace{10pt}
+
+
+\textbf{Lemma \ref{Lem:Adequacy}}
+
+For all $P \in \pi^{session}$ such that $\Gamma \vdash P$, $P \sqsubseteq_{test} \llbracket P \rrbracket$
+
+\begin{proof}
+(Sketch) Coinduction on the \autoref{fig:sessLTS} such that $P$ $R$ $Q$ where $Q = \llbracket P \rrbracket$ and $R \subseteq \simeq_{test}$.
+
+We define the set of observable actions in $\pi^{session}$, $\alpha ::= \{a!\langle v \rangle, a?(y), a \vartriangleright \{l_i : P_i \}, a \vartriangleleft l_j, \tau \}$.
+
+We perform coinduction on a subset of observable actions $\alpha'$ which does not include $\tau$, and display the relevant transitions \autoref{fig:sessLTS} such that $P \downarrow_{x}$. Let $P$ be a $\pi^{session}$ process and $Q$ be typed by the subset of $\pi^{linear}$ terms such that $\llbracket \Gamma_{session} \rrbracket \vdash Q$ and relation $R$ obtained when $P$ $R$ $Q$:
+
+\begin{itemize}
+    \item \textsc{(R$\pi$-Output)}: We have process $P$ such that $P \xrightarrow{\mu} P'$ where $\xrightarrow{\mu} ::= (P, \{a!\langle v \rangle \}, P')$ by \autoref{fig:sessLTS}. By Theorem \ref{Lem:OperationalCorr} we have $Q$ such that $Q \rightarrow^* Q'$ and $Q' = \llbracket P' \rrbracket$. We use \autoref{fig:Encoding} to get $\llbracket P \rrbracket$. By induction hypothesis $C[P] \Downarrow^{may}_{a!}$ implies $C[Q] \Downarrow^{may}_{a!}$ and considering $K$ as an observer. Using \autoref{fig:congSes} we can assert $P \equiv (\nu \widetilde{c})(a!\langle v \rangle.P' \mid K)$ therefore $P \downarrow_{a!}$ we can assert by Lemma \ref{Lem:ChannelRename} that $\llbracket P \rrbracket_f \downarrow_{f_{a!}}$. Following this $(P \mid K) \Downarrow^{may}_{a!}$ where $K \xrightarrow{\omega}$, and $(\llbracket P \mid K \rrbracket) \Downarrow^{may}_{f_{a!}}$ where $\llbracket K \rrbracket \xrightarrow{\omega}$. There is no distinguishing evaluation context $C$ such that $C[P] \not \Downarrow$ and such for $C[Q]$. Therefore $R \subseteq \sqsubseteq_{may}$
+    
+    We assert that all maximal computations from $P \xrightarrow{\mu} P'$ are covered by the may case then $R \subseteq \sqsubseteq_{must}$. Since $C[P] \Downarrow^{must}_{a!}$ this implies $C[Q] \Downarrow^{must}_{a!}$ by Definition \ref{def:mustequiv}. As $R \subseteq \sqsubseteq_{may} \cup \sqsubseteq_{must}$ then $R \subseteq \sqsubseteq_{test}$.
+    
+    \item \textsc{(R$\pi$-Select)}: We follow a similar process as in the output case. Let $P \xrightarrow{\mu} P'$ where $\xrightarrow{\mu} ::= (P, \{a \vartriangleleft l_j \}, P')$. Per the definition of testing, we do not discriminate the difference in values being output we simply observe that process has the capability to output on the name. We acquire $Q$ by Theorem \ref{Lem:OperationalCorr}, and encode it by \autoref{fig:Encoding}. We conclude as in the \textsc{(R-Output)} case and state that $R \subseteq \sqsubseteq_{may} \cup \sqsubseteq_{must}$.
+    
+    \item By the definition of testing, we cannot observe an input action, hence it shall be covered when $\alpha$ is the set of observable actions including $\tau$.
+\end{itemize}
+
+We now discuss when the observable actions are internal actions. We assert that for every process in $P \in \pi^{session}$ such that for all maximal reduction sequences and observer $K$, $P \mid K \xrightarrow{\tau} P' \mid K'$ where $K \xrightarrow{\omega} K'$. Using Theorem \ref{Lem:OperationalCorr} we can assert that there exists $\llbracket P \rrbracket$. We then place $\llbracket P \mid K \rrbracket$ maintains the same behaviour as $P$ in every evaluation context $C$.
+
+We conclude that $P$ $R$ $Q$ for all $P'$ $R'$ $Q'$ that $R' \subseteq \sqsubseteq_{test}$.
+\end{proof}
+
+\vspace{10pt}
+
+
+\textbf{Lemma \ref{lem:blocking}:}
+
+If $\Gamma \vdash_{session} P$, then $P \not \rightarrow$ if and only if $\llbracket P \rrbracket \not \rightarrow$
+
+\begin{proof}
+We start by proving that $P \not \rightarrow$ implies $\llbracket P \rrbracket \not \rightarrow$
+
+\begin{itemize}
+    \item Assume for sake of contradiction that $P \not \rightarrow$ implies $\llbracket P \rrbracket \rightarrow$
+    \item If $P \cong \llbracket P \rrbracket$ then $\llbracket P \rrbracket \rightarrow \llbracket P' \rrbracket$.
+    \item Assuming our first statement is true, by operational correspondence if $\llbracket P \rrbracket \rightarrow Q$ implies $P \rightarrow P'$, hence a contradiction. 
+\end{itemize}
+
+Now we prove that $\llbracket P \rrbracket \not \rightarrow$ implies $P \not \rightarrow$
+\begin{itemize}
+    \item Assume for sake of contradiction that $P \rightarrow$ implies $\llbracket P \rrbracket \not \rightarrow$
+    \item Assuming our statement is true, by operational correspondence if $P \rightarrow P'$ then this implies $\llbracket P \rrbracket \rightarrow \llbracket P' \rrbracket$ through case normalisation, hence a contradiction.
+\end{itemize}
+\end{proof}
+
+
+
+% Case \textsc{(R-Output)}: By \autoref{fig:sessLTS} $P \xrightarrow{\alpha}$ where $\xrightarrow{\alpha} = (P, \{a!\langle b \rangle\}, P')$. By \autoref{def:StrongBarb} we have $P \downarrow_{a!}$. We use Lemma \ref{Lem:OperationalCorr} to get $\llbracket P \rrbracket$. By \autoref{fig:linLTS} we have $\llbracket P \rrbracket_f \xrightarrow{\alpha'}$ where $\xrightarrow{\alpha'} = (\llbracket P \rrbracket_f, \{f_{a!}\langle \llbracket b \rrbracket, c\rangle \}, \llbracket P' \rrbracket_f)$. By Lemma \ref{Lem:ChannelRename} we have that $\llbracket P \rrbracket_f \downarrow_{f_{a!}}$. 
+% By IH $P$ $R$ $Q$, where $R \subseteq \sim_{test}$. 
+
+% $R \subseteq \sim_{may}$ implies $P \Downarrow^{may}_{a!}$ and $Q \Downarrow^{may}_{a!}$. We consider observer $o$ 
+
+% Linearity, Persistence and Testing Semantics in the Asynchronous Pi-Calculus
+
+\vspace{10pt}
+
+\textbf{Lemma \ref{Lem:Completeness}:}
+
+Let $P, Q$ be two $\pi^{session}$ processes such that $\Gamma \vdash P$ and $\Gamma \vdash Q$, then $P \simeq_{test} Q$ implies $\llbracket P \rrbracket \simeq_{test} \llbracket Q \rrbracket$.
+
+
+\begin{proof}
+(Sketch) Let $P$ be a $\pi^{session}$ process s.t $\Gamma \vdash P$. Assume there exists $R$ such that $P$ $R$ $Q$ if $Q = \llbracket P \rrbracket$.
+
+By hypothesis we show that $R \subseteq \sqsubseteq_{may}$:
+
+\begin{itemize}
+    \item By Definition \ref{def:mayequiv} if $P \sqsubseteq_{may} Q$ it implies $P \Downarrow^{may}_{x!}$ and $Q \Downarrow^{may}_{x!}$ where $x$ is an arbitrary session or channel name. It follows that there exists $P'$, $P \xrightarrow{\alpha} P'$, and $P \downarrow_{x!}$. There are only two possible derivations:
+    \begin{itemize}
+        \item Case \textsc{R-Output}: We use Definition \autoref{def:observations} to get $P \equiv (\nu \widetilde{c})(x!\langle v \rangle.P_1 \mid P_2)$ with $x \not \in \widetilde{c}$. We use Lemma \ref{Lem:OperationalCorr} to assert that since $P \xrightarrow{\alpha} P'$ then there exists $\llbracket P \rrbracket \xrightarrow{\alpha} \hookrightarrow \llbracket P' \rrbracket$. By \autoref{fig:Encoding} we get:
+        \begin{equation*}
+            \llbracket P \rrbracket \equiv (\nu \widetilde{c}) ((\nu c')f_{x!}\langle \llbracket v \rrbracket, c' \rangle. \llbracket P_1 \rrbracket_{f_\{x \mapsto c'\}} \mid \llbracket P_2 \rrbracket_f ) \text{ with } x, c' \not \in \widetilde{c}
+        \end{equation*}
+        By Lemma \ref{Lem:ChannelRename} we can state that $\llbracket P \rrbracket \downarrow_{f_{x!}}$, therefore $R \subseteq \sqsubseteq_{may}$ and we conclude with Lemma \ref{lem:blocking}.
+        
+        \item Case \textsc{R-Select}: We use Definition \autoref{def:observations} to get $P \equiv (\nu \widetilde{c})(x \vartriangleleft l_j.P_1 \mid P_2)$ with $x \not \in \widetilde{c}$. We use Lemma \ref{Lem:OperationalCorr} to assert that since $P \xrightarrow{\alpha} P'$ then there exists $\llbracket P \rrbracket \xrightarrow{\alpha} \hookrightarrow \llbracket P' \rrbracket$. By \autoref{fig:Encoding} we get:
+        \begin{equation*}
+            \llbracket P \rrbracket \equiv (\nu \widetilde{c})((\nu c')f_{x!} \langle l_j\_c' \rangle. \llbracket P_1 \rrbracket_{f, \{x \mapsto c' \}} \mid \llbracket P_2 \rrbracket_f ) \text{ with } x, c' \not \in \widetilde{c}
+        \end{equation*}
+        By Lemma \ref{Lem:ChannelRename} that $\llbracket P \rrbracket \downarrow_{f_{x!}}$, therefore $R \subseteq \sqsubseteq_{may}$ and we conclude with Lemma \ref{lem:blocking}.
+    \end{itemize}
+\end{itemize}
+
+We now show that $R \subseteq \sqsubseteq_{must}$. We define the function $\psi : \mathbf{N} \rightarrow \mathbf{N}$ which is a strictly increasing function.
+
+\begin{itemize}
+    \item We suppose that $P \Downarrow^{must}_{x!}$, which means that for each maximal computation and considering observer $K$, starting from $P$, for all $n$, $P_n \downarrow_{x!}$ where $\llbracket P_n \mid K_n \rrbracket$. By Lemma \ref{Lem:OperationalCorr} we know that as $P \xrightarrow{\alpha}^* P_{\psi(n)}$ then there must exist maximal reduction sequence $Q \mid K$, such that $Q_n \mid K_n \xrightarrow{\alpha} \llbracket P_{\psi(n)} \mid K_{\psi(n)} \rrbracket$. By hypothesis, $P_{\psi(n)} \downarrow_{x!}$ which implies $Q_{\psi(n)} \downarrow_{f_{x!}}$. We conclude with Lemma \ref{lem:blocking}
+\end{itemize}
+
+As $R \subseteq \sqsubseteq_{may} \cup \sqsubseteq_{must}$ then $P \sqsubseteq_{test} Q$. By Lemma \ref{Lem:Adequacy} and Lemma \ref{Lem:Definability} we have that $\llbracket P \rrbracket \sqsubseteq P$, hence $P \simeq_{test} \llbracket P \rrbracket$
+
+\end{proof}
+
+\vspace{10pt}
+
+
+\textbf{Lemma \ref{Lem:Soundess}:}
+
+Let $P, Q$ be two $\pi^{session}$ processes such that $\Gamma \vdash P$ and $\Gamma \vdash Q$, then $\llbracket P \rrbracket \simeq_{test} \llbracket Q \rrbracket$ implies $P \simeq_{test} Q$.
+
+\begin{proof}
+(Sketch) Let $Q$ be a $\pi^{linear}$ process and $\Gamma \in \pi^{session}$ s.t $\llbracket \Gamma \rrbracket \vdash Q$. Assume there exists $R$ such that $Q$ $R$ $P$ if $P = E$ where $\Gamma \vdash E$ and $\llbracket E \rrbracket = Q$. 
+
+By hypothesis we show that $R \subseteq \sqsubseteq_{may}$:
+\begin{itemize}
+    \item By Definition \ref{def:mayequiv} if $Q \sqsubseteq_{may} Q$ it implies $Q \Downarrow^{may}_{x!}$ and $Q \Downarrow^{may}_{x!}$ where x is an arbitrary session or channel name. It follows that there exists $Q'$, $Q \xrightarrow{\alpha} Q'$, and $Q \downarrow_{x!}$. There is only one possible derivation:
+    \begin{itemize}
+        \item Case \textsc{R$\pi$-Output}: By Definition \ref{def:observations} if $Q \in \pi^{linear}$ and there exists $Q', Q \xrightarrow{\alpha}^* Q'$ and $Q \downarrow_{x!}$ then $Q' \equiv (\nu \widetilde{c})(x!\langle \widetilde{v} \rangle.P_1 \mid P_2)$. We use Lemma \ref{Lem:OperationalCorr} to get $P'$, $Q \xrightarrow{\alpha}^* Q' = \llbracket E \rrbracket$. We use Lemma \ref{Lem:Adequacy} $P \sqsubseteq_{test} Q$. We use Definition \ref{fig:Encoding} to get:
+        \begin{equation*}
+            \llbracket E \rrbracket \equiv (\nu \widetilde{c})((\nu c')f_{x!}\langle \llbracket v \rrbracket_f, c' \rangle.\llbracket P_1 \rrbracket_{f, \{x \mapsto c' \}} \mid \llbracket P_2 \rrbracket_f ) \text{ with } x, c' \not \in \widetilde{c}
+        \end{equation*}
+        We can assert by Lemma \ref{Lem:ChannelRename} that if $Q \downarrow_{x!}$ then $P \downarrow_{x!}$. We conclude with Lemma \ref{lem:blocking}.
+    \end{itemize}
+    By hypothesis we show $R \subseteq \sqsubseteq_{must}$. We define the function $\psi : \mathbf{N} \rightarrow \mathbf{N}$ which is a strictly increasing function.
+    \begin{itemize}
+        \item We suppose $Q \Downarrow^{must}_{x!}$. which means that for each maximal computation and considering observer $K$ $Q \mid K$ starting from $Q$, for all $n$, $Qn \downarrow_{x!}$ where $\llbracket E_n \mid K_n \rrbracket$. By Lemma \ref{Lem:OperationalCorr} we know that as $Q \xrightarrow{\alpha}^* Q_{\psi(n)}$ then there must exist a maximal computation $P \mid K$ such that $P_n \mid K_n \xrightarrow{\alpha}^* \llbracket P_{\psi(n)} \mid K_{\psi(n)}$. By hypothesis $Q \downarrow_{\psi(n)} \downarrow_{f_{x!}}$ which implies $P_{\psi(n)} \downarrow_{x!}$. We conclude with Lemma \ref{lem:blocking}. 
+    \end{itemize}
+\end{itemize}
+
+As $R \subseteq \sqsubseteq_{may} \cup \sqsubseteq_{must}$ then $Q \sqsubseteq_{test} P$, and by Lemma \ref{Lem:Definability} we have that $Q \simeq_{test} P$.
+\end{proof}
+
+\vspace{10pt}
+
+
+\textbf{Theorem \ref{Th:FullAbstraction}:}
+
+Let $P, Q$ be two $\pi^{session}$ processes such that $\Gamma \vdash P$ and $\Gamma \vdash Q$, then $P \simeq_{test} Q$ iff $\llbracket P \rrbracket \simeq_{test} \llbracket Q \rrbracket$.
+
+We state that by \ref{Lem:Completeness} and \ref{Lem:Soundess} that the Full Abstraction result holds. 
+
+\end{document}

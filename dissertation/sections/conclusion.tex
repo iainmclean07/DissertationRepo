@@ -1,0 +1,28 @@
+\begin{document}
+
+\section{Summary}
+
+This paper adapted the formulation of the full abstraction theorem devised in \citep{demangeon2011full} and applied it to the encoding of session types presented in \cite{dardha2017session}. We extended the operational semantics of the calculus to emit behaviour through implementing a labelled transition system. Following the widely cited literature surrounding behavioural equivalences, we define observations on processes through the formal definition of barbs \cite{milner1992barbed} \cite{sangiorgi2001barbed}. We then implemented testing semantics by introducing observers \cite{10.1007/978-3-540-49382-2_9} \cite{DBLP:conf/fossacs/BorealeNP99} so that we can use the co-inductive proof technique on process behaviour \cite{coinductionSangiorgi}. We then prove the relevant Lemmas presented in \citep{demangeon2011full} in order to prove that the encoding of session types to linear types is fully abstract.
+
+\section{Future work}
+
+The full abstraction theorem as discussed in \citep{DBLP:journals/mscs/GorlaN16fullabsmyths} full abstraction may not be a solid enough proof to demonstrate the exact mapping between denotations in the source and target language. Exploring this further could be valuable to the research community, possibly building upon the thoroughly discussed area of behavioural equivalences. Testing has not been discussed as much in the literature, and so extending behavioral equivalences in the $\pi$-calculus is confusing. Thus devising a more solid framework to create and test behavioural equivalences would be an interesting topic of research.
+
+Full completeness is also widely discussed in the theoretical field, and the fully abstract semantics demonstrated in this paper could be extended with this theorem, making a stronger connection between terms in the source and target language \cite{DBLP:journals/entcs/BengtsonP07}. 
+
+Extending the work of \citep{dardha2017session} with asynchronicity and demonstrating that the equivalences presented here still hold could be a valuable addition to the calculus, and would be more appropriate for a theoretical base for a distributed programming language. 
+
+As dicussed in \citep{DBLP:journals/corr/Palamidessi13} there is a gap between the asynchronous and synchronous calculus when defining the expressive power of the language. Exploring this further and devising a more accurate process equivalence specifically for a non-deterministic asynchronous process calculus could lead to important results for a relevant calculus for modern day languages.
+
+Finally providing a more accurate account of full abstraction presented in this paper, extended with replication or recursion rather than the finite calculus presented here would demonstrate the power of the renaming function in a calculus. The main issue that was faced in this paper was exploring the issue of communicating on restricted channels in the encoding. Where there may be a free name in the session typed $\pi$-calculus, due to the renaming function it may encode this free name as a bound name, meaning that these terms may not have the same behaviour in the same environment. What was stated in this paper was that due to the nature of the renaming function, renaming from the outermost term to the innermost came the assertion that any free names are directly bound to the process involved in the communication. There may be examples with a more complex calculus that may lead to discrepancies in behavioural equivalnces.
+
+% \begin{itemize}
+%     \item Provide more rigourous proofs for the theorems devised in this paper.
+%     \item Extend the presented calculus with replication, and prove these hold for infinite reduction sequences, rather than the finite calculus presented in this paper.
+%     \item Explore testing further, devise a solid presentation of testing for synchronous and asynchronous calculus.
+%     \item Devise a full abstraction theorem using a finer equivalence than the testing semantics presented. Barbed congruence is a strong equivalence, and could be used to provide a finer full abstraction result. 
+%     \item Extend this proof with the full completeness theorem.
+    
+% \end{itemize}
+
+\end{document}

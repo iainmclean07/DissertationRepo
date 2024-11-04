@@ -1,0 +1,59 @@
+\begin{document}
+In this section we will explore the problem of full abstraction and describe the methodology of the mainstream approaches to how this problem has been solved in various forms of the $\pi$-calculus. There is a paper \citep{demangeon2011full} in which the problem of full abstraction in a linearly typed $\pi$-calculus was proven and such the results of this paper are closely based on the process that this paper followed. 
+
+\section{Full Abstraction Problem}\label{FullAbsProblem}
+
+Full abstraction is a very commonly explored issue in the theoretical space, and has been demonstrated in many different process calculi ranging from CCS, $\lambda$-calculus and of course $\pi$-calculus. It was first explored by \citep{MILNER19771} and \citep{PLOTKIN1977223} for different PCF (Programming with Computable Functions). 
+
+At a high level full abstraction of an encoding states that a term defined under its standard denotational semantics is observationally equivalent to the term when encoded in any context. The theorem was derived to capture equivalences between processes that are denotationally different but still perform the same function in the context, or behaviourally the same. This arose \cite{PLOTKIN1977223} as to create a finer equivalence between the denotational semantics of a language and its operational semantics. 
+
+To relate it more closely to the session typed $\pi$-calculus according to the literature \cite{demangeon2011full} \cite{MILNER19771} we derive a notion of computational adequacy and extending this to prove that the encoding is sound and complete. Whereas in other process calculus this can be proved through focusing entirely on the denotational semantics, the most common approach to this problem in CCS based calculi is to study the observational behaviour of the calculus under asynchronous testing. 
+
+As discussed in \citep{curien2007definability} proving the full abstraction property of a process calculi allows us to derive an operational correspondence between the syntax of the proof system and its semantics under any context, if it is observable or not. As we will be considering the full abstraction of the encoding between the session typed and linearly typed $\pi$-calculus then this problem is re-framed to deriving that for any term in the source language its encoding is observationally and operationally equivalent, and similarly for any term in the target language the same holds. Additionally there is stipulation that these processes must still hold these properties in any arbitrary context that they are placed into.
+
+As is presented in \citep{demangeon2011full} to prove full abstraction for a linearly typed $\pi$-calculus encoding then it is sufficient to prove that this encoding is adequate, which in turn proves the soundness of the encoding, and that it is definable which aids us in deriving the full abstraction result or completeness.
+\section{Observability}\label{Observability}
+
+Defining observability is a key step in reaching the full abstraction result. For concurrent communicating calculus we need to understand when a process can affect is global environment, and abstract that away from when just internal actions are taking place. This is such that if a process only performs internal actions, then intuitively whenever it is placed in any arbitrary context it will not have any affect on any other processes. As shown in \citep{demangeon2011full}, \citep{jeffrey2005full} and \citep{bucciarelli2011full} as a small sample, it is a necessary step to define the observable processes within the calculus in question. In order to observe the possible operations of a term, we will need to introduce a mechanism for processes to emit their behaviour. This is achieved through a \textit{labelled transition system} which expands on the operational semantics to define the triple such that it includes the domain, a set of labels and the binary relation which in this case would be the reduction relation for every such label \cite{BAETEN2014399}. An example would be the relation:
+\begin{equation*}
+    P \xrightarrow{\alpha} Q \: \text{ when there exists } \: (P, Q) \in \xrightarrow{\alpha} 
+\end{equation*}
+
+To then observe the labels we need to define \textit{observability predicates} otherwise known in the literature \cite{sangiorgi2003pi} as \textit{barbs}. These predicates will return the observable names within a process and are an integral mechanism used in asynchronous testing.
+
+We follow the process in \citep{milner1992barbed}, \citep{sangiorgi2001barbed}, \citep{sangiorgi2003pi} and importantly \citep{demangeon2011full} in intoducing the relevant definitions in order to implement a notion of bisimilarity between processes.
+
+\section{Bisimulation}\label{BisimulationSection}
+
+As described previously we need to be able to compare the observable actions that two processes can make when represented in two different semantic models. The approach as defined by \citep{milner1992barbed} and expanded upon by \citep{sangiorgi2003pi} is to implement behavioural equivalences, namely bisimulations.
+
+We will define the observations and equivalences formally in \autoref{sec:Observables}, but to introduce the topic we will first discuss \textit{reduction bisimulation}. As defined in \citep{sangiorgi2003pi} a relation $S$ is a reduction bisimulation whenever there exists $P, Q \in S$ where if $P \xrightarrow{\tau} P'$ then it implies that $Q \xrightarrow{\tau} Q'$ such that $P', Q' \in S$, and also that the converse is true. 
+
+This is a very weak process equivalence as discussed in the book, so to further motivate the purpose of bisimulation we will introduce \textit{reduction congruence}, where the same definition is true with the extension that $P, Q$ are placed in arbitrary context $C$. 
+
+Whereas reduction equivalence does not distinguish the difference between $x!\langle v \rangle.0$ and $0$, reduction congruence differs as for this example if we had the context $C \equiv x?(y) | [.]$ where $[.]$ is a hole to be filled with a process, then we can state $P, Q \not \in S$ where $C[P]$ $S$ $C[Q]$ as $C[P] \xrightarrow{\tau} C'[P']$ and $C[Q] \not \rightarrow$. 
+
+As there are many cases where context may block the actions of $P$, implementing \textit{evaluation contexts} become necessary to test processes \cite{DBLP:journals/jlp/FournetG05}. An evaluation context makes the simple distinction of preventing $P$ to be included in a process that prevents the observable reduction that we want to study. It specifies a context such that $P$ is never under an input or output prefix which would prevent $P$ from emitting any behaviour due to deadlock.
+
+For the full abstraction proof we will need a much finer equivalence than this to derive this result, which leads us to introducing observability predicates otherwise stated in the literature as "barbs". These will allow us to directly observe the names on which processes communicate \cite{sangiorgi2003pi}.
+
+\section{Asynchronous Testing}\label{AsynTestingSection}
+
+The staple paper that is cited in the majority of full abstraction papers is \citep{Hennessy1988AlgebraicTO} which is unfortunately unavailable, but further work by Matthew Hennessy on asynchronous testing was published in \citep{10.1007/978-3-540-49382-2_9} which we will be using to test the bisimulation properties. 
+
+We introduce \textit{May and must testing} which allows us to extend the observational equivalences with the added precondition that a process \textit{may} or \textit{must} communicate on a specified name. We can then show that if that process can communicate on that name, then it must be structurally congruent to a specific term, and thus show the encoding and vice versa.
+
+We also specify observers which allow us to capture the observable actions of processes, and produce a special subset of operational semantics for observers such that they can emit a \textit{success action} when $P$ the observation predicate holds. 
+
+\subsubsection{Observation Issues}
+As discussed in \citep{10.1007/978-3-540-49382-2_9} and \citep{castellan2019two} when observing processes in an asynchronous calculus, the only observable actions are output actions. This is due to the fact that an asynchronous \textit{observer} or \textit{tester} cannot observe when a process can receive an input as this would amount to detecting when the tester's outputs are consumed. To rectify this issue we follow the definition of an observable process in \citep{demangeon2011full}.
+
+% \todo{The major issue that many papers have discussed is that when a process under observation is communicating with another process then by the rules of the calculus where both endpoints are only known by the parties involved, that no behaviour can be observed. }
+
+
+
+
+
+% paper where I found the references Definability and full abstraction
+
+\end{document}

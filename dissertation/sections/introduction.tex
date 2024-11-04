@@ -1,0 +1,49 @@
+\begin{document}
+\section{Overview}
+Session typed $\pi$-calculus provides a framework to accurately model computations in a complex concurrent distributed system, being able to write them as well-typed processes similar to other CCS based process calculi. This paper tackles one of the most challenging problems surrounding process calculi, proving full abstraction. Full abstraction was initially formulated to answer the question: "What is the meaning of a program?". Simply comparing the denotational semantics of a language is not a fine enough equivalence to compare two terms; as such, we look towards the operational semantics of language and attempt to understand the abstract behaviour of a process. What we aim to correlate with the full abstraction result is the assertion that if a program is behaviourally equivalent, then the terms are denotationally the same, and the denotational semantics are said to be \textit{fully abstract}.
+
+This paper will adapt the session typed $\pi$-calculus from the paper "Session Types Revisited" \cite{dardha2017session}, and introduce finer behavioural equivalences in order to compare the behaviour between terms related by an encoding.
+
+
+% Full Abstraction is the notion that two terms are only equivalent if and only if their encodings are equivalent. As discussed in previous papers, to tackle this problem on concurrent process calculi its more appropriate to observe process behaviour rather than define equalities based on denotational semantics. This paper will follow the same process, define behavioural equivalences between the calculi defined in the paper Session Types Revisited and finally derive the full abstraction theorem.
+
+
+
+\section{Motivation}
+With the rapid development of computer networks in recent years, modelling these concurrent systems has become a vital component of advancing the technology developed surrounding distributed systems. Therefore the advent of a process calculus based on the work of \cite{milner1980calculus} was developed to accurately model concurrent systems and produce languages related to distributed programming.
+
+$\pi$-Calculus is a well-established process calculus similar to $\lambda$-Calculus but provides a better model to explore concurrent computing. While $\lambda$-Calculus mainly explores sequential computation using abstract functions, $\pi$-Calculus uses processes as representations of nodes and channels as the link of communication between processes.
+
+$\pi$-Calculus has many different uses, such as reasoning about security protocols \cite{ryan2011applied} to being a theoretical model for programming languages such as Pict \cite{DBLP:conf/tppp/Pierce94} and more abstractly CSP based programming languages such as Go and Erlang.
+
+While standard $\pi$-Calculus is a valuable tool to reason about distributed systems, there remains the issue of the agreement on protocols within the system. Extending this calculus with session types allows representing these protocols as type abstractions to reason about communication in a sequential manner. 
+
+The calculus introduced in this paper encodes session typed processes into the standard $\pi$-calculus with linear types. These define a particular communication type such that channels are used once for either input or output discussed later. This clear distinction is vitally important in guaranteeing communication fidelity and privacy. The restraints of linear types infer that the continuation of processes need to be explicitly passed to processes such that there is greater control of resources in the system.
+
+\section{Aims}
+
+This project aims to devise a solution for the full abstraction theorem, by introducing behavioural equivalences on processes, and extending those equivalences with testing. As such, the primary aims are:
+
+\begin{itemize}
+    \item Thoroughly explain the concepts surrounding $\pi$-calculus, session types, linear types and encoding.
+    \item Devise an operational semantics such that processes emit behaviour.
+    \item Introduce behavioural equivalences on processes.
+    \item Formalise testing semantics and apply these to behavioural equivalences.
+    \item Deduce the full abstraction theorem for the encoding of session typed $\pi$-calculus to linearly typed $\pi$-calculus 
+\end{itemize}
+
+\section{Outline}
+
+\textbf{Chapter 2 - Background} This chapter explores the session typed $\pi$-calculus and the linearly typed $\pi$-calculus and relate them through the encoding.
+
+\textbf{Chapter 3 - Analysis} This chapter describes the high-level problems tackled in the implementation section as described by the literature surrounding this research
+
+\textbf{Chapter 4 - Implementation} This chapter introduces the behavioural based operational semantics and the relevant behavioural equivalences such that the full abstraction problem can be proved.
+
+\textbf{Chapter 5 - Evaluation} This chapter provides the proofs for the Lemmas and Theorems devised in the implementation section.
+
+\textbf{Chapter 6 - Conclusion} This chapter reflects on the full abstraction theorem and the approach taken to reach the result.
+
+% Full Abstraction is a complex problem that has been explored in many different papers
+
+\end{document}

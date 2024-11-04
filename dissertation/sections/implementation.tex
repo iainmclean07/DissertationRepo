@@ -1,0 +1,426 @@
+\begin{document}
+
+\section{Labelled Transition System}
+As discussed in \autoref{Observability} we will first need to define a \textbf{labelled transition system} (LTS) to observe the actions of processes. We design this labelled transition system in the standard way. 
+\subsection{LTS for $\pi^{session}$}
+
+We use $\alpha$ to range over the labels:
+\begin{equation*}
+    \alpha ::= a!\langle v \rangle \; | \; a?(y) \; | \; a \vartriangleright \{ l_i : P_i \} \; | \; a \vartriangleleft  l_j \; | \; \tau
+\end{equation*}
+
+We define the LTS as in \citep{coinductionSangiorgi}.
+An LTS is a triple $(P, \mathbf{A}, T)$ where $P$ is the set of processes, $\mathbf{A}$ is the set of actions $\alpha$ and $T \subseteq (P, Act, P')$ the transition relation.
+
+\begin{figure}
+    \centering
+    \begin{align*}
+        \inferrule[(R-Output)]{ }{a!\langle b \rangle.P \xrightarrow{a!\langle b \rangle} P} &
+        &\inferrule[(R-Input)]{ }{a?(b).P \xrightarrow{a?(v)} P \: \{v/b \}}
+    \end{align*}
+    \begin{align*}
+        \inferrule[(R-Select)]{ }{x \vartriangleleft l_j.P \xrightarrow{x \vartriangleleft l_j.P} P} &
+        &\inferrule[(R-Branch)]{ }{x \vartriangleright \{l_i : P_i \}.P_i \xrightarrow{x \vartriangleright \{ l_j : P_j\}} P_j} j \in I
+    \end{align*}
+    \begin{align*}
+        & \inferrule[(R-Res)]{P \xrightarrow{\alpha} P' \\ x \in bn(\alpha)}{(\nu x) P \xrightarrow{\tau} P'}&
+        &\inferrule[(R-Open1)]{P \xrightarrow{\alpha} P' \\ x \not \in n(\alpha)}{(\nu x) (P \: | \: Q) \xrightarrow{\alpha} (\nu x)(P' \: | \: Q)} &
+        &\inferrule[(R-Open2)]{P \xrightarrow{\alpha} P' \\ x,y \not \in n(\alpha)}{(\nu xy) (P \: | \: Q) \xrightarrow{\alpha} (\nu xy)(P' \: | \: Q)} 
+    \end{align*}
+    \begin{align*}
+        \inferrule[(R-Close1)]{P \xrightarrow{\alpha} P' \\ Q \xrightarrow{\alpha'} Q' \\ x \in bn(P) \cap bn(Q)}{(\nu x) (P \: | \: Q) \xrightarrow{\tau} (\nu x) (P' \: | \: Q')} &
+        &\inferrule[(R-Close2)]{P \xrightarrow{\alpha} P' \\ Q \xrightarrow{\alpha'} Q' \\ x,y \in bn(P) \cap bn(Q)}{(\nu xy) (P \: | \: Q) \xrightarrow{\tau} (\nu xy) (P' \: | \: Q')}
+    \end{align*}
+    \begin{align*}
+        \inferrule[(StndCom)]{P \xrightarrow{\alpha} P' \\ Q \xrightarrow{\alpha'} Q' \\ fn(P) \cap fn(Q) \not = \emptyset}{P \: | \: Q \xrightarrow{\tau} P' \: | \: Q'} &
+        &\inferrule[(R-StndRes)]{P \xrightarrow{\alpha} P' \\ Q \xrightarrow{\alpha} Q' \\ x \in bn(P) \cap bn(Q)}{(\nu x) (P \: | \: Q) \xrightarrow{\tau} (\nu x)(P' \: | \: Q')}
+    \end{align*}
+    \begin{align*}
+        \inferrule[(R-CloseExt)]{P \xrightarrow{\alpha} P' \\ Q \xrightarrow{\alpha'} Q' \\ x \not \in fn(Q)}{(\nu x) P \: | \: Q \xrightarrow{\tau} (\nu x) (P' \: | \: Q')} &
+        &\inferrule[(R-Struct)]{P \equiv P' \\ P \xrightarrow{\alpha} Q \\ Q \equiv Q'}{P' \xrightarrow{\alpha} Q'}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Labelled Transition System for the session typed $\pi$-calculus. We omit the symmetrical cases of \textsc{(R-Open1), (R-Open2)} and we can assert by \textsc{(R-Res)} that this holds when composed with arbitrary process Q, s.t $n(P) \cap n(Q) = \emptyset$. }
+    \label{fig:sessLTS}
+\end{figure}
+
+
+The LTS for $\pi^{session}$ is defined in \autoref{fig:sessLTS}. The labelled transition system (LTS) reflects the operational semantics defined in \citep{dardha2017session}. The motivation for an LTS is discussed in paper \citep{sobocinski2007well} such that we can introduce behavioural equivalences originally introduced in \citep{10.1007/978-3-540-49382-2_9}.
+
+\subsection{LTS for $\pi^{linear}$}
+
+We use $\mu$ to range over the labels:
+
+\begin{equation*}
+    \mu :== a!\langle \widetilde{v} \rangle \: | \: a?(\widetilde{y}) \: | \: l_j\_(x_j) \vartriangleright P_j \: | \: \tau
+\end{equation*}
+
+\begin{figure}
+    \centering
+    \begin{align*}
+        \inferrule[(R$\pi$-Output)]{ }{a!\langle \widetilde{b} \rangle.P \xrightarrow{a!\langle \widetilde{b} \rangle} P} &
+        &\inferrule[(R$\pi$-Input)]{ }{a?(\widetilde{b}).P \xrightarrow{a?(\widetilde{\alpha})} P \: \{\widetilde{\alpha}/ \widetilde{b} \}} 
+    \end{align*}
+    \begin{align*}
+        &\inferrule[(R$\pi$-Case)]{ }{\text{case } l_j\_v \text{ of } \{l_i\_(x_i) \vartriangleright P_i \}_{i \in I} \xrightarrow{l_j\_(x_j) \vartriangleright P_j} P_j \{v / x_j\}} j \in I &
+        & \inferrule[(R$\pi$-Res)]{P \xrightarrow{\mu} P' \\ \widetilde{x} \in bn(\mu)}{(\nu \widetilde{x}) P \xrightarrow{\tau} P'}&
+    \end{align*}
+    \begin{align*}
+        \inferrule[(R$\pi$-Close)]{P \xrightarrow{\mu} P' \\ Q \xrightarrow{\mu'} Q' \\ \widetilde{x} \in bn(P) \cap bn(Q)}{(\nu \widetilde{x}) (P \: | \: Q) \xrightarrow{\tau} (\nu \widetilde{x}) (P' \: | \: Q')} &
+        &\inferrule[(R$\pi$-Open)]{P \xrightarrow{\mu} P' \\ \widetilde{x} \not \in n(\mu)}{(\nu \widetilde{x}) (P \: | \: Q) \xrightarrow{\mu} (\nu \widetilde{x})(P' \: | \: Q)} &
+        % &\inferrule[(R-Open2)]{P \xrightarrow{\mu} P' \\ x,y \not \in n(\mu)}{(\nu xy) (P \: | \: Q) \xrightarrow{\mu} (\nu \widetilde{x})(P' \: | \: Q)} 
+    \end{align*}
+    % \begin{align*}
+    %      &
+    %     % &\inferrule[(R-Close2)]{P \xrightarrow{\alpha} P' \\ Q \xrightarrow{\alpha'} Q' \\ x,y \in bn(P) \cap bn(Q)}{(\nu xy) (P \: | \: Q) \xrightarrow{\tau} (\nu xy) (P' \: | \: Q')}
+    % \end{align*}
+    \begin{align*}
+        \inferrule[(R$\pi$-StndCom)]{P \xrightarrow{\mu} P' \\ Q \xrightarrow{\mu'} Q' \\ fn(P) \cap fn(Q) \not = \emptyset}{P \: | \: Q \xrightarrow{\tau} P' \: | \: Q'} &
+        &\inferrule[(R$\pi$-StndRes)]{P \xrightarrow{\mu} P' \\ Q \xrightarrow{\mu} Q' \\ x \in bn(P) \cap bn(Q)}{(\nu x) (P \: | \: Q) \xrightarrow{\tau} (\nu x)(P' \: | \: Q')}
+    \end{align*}
+    \begin{align*}
+        \inferrule[(R$\pi$-CloseExt)]{P \xrightarrow{\mu} P' \\ Q \xrightarrow{\mu'} Q' \\ \widetilde{x} \not \in fn(Q)}{(\nu \widetilde{x}) P \: | \: Q \xrightarrow{\tau} (\nu \widetilde{x}) (P' \: | \: Q')} &
+        &\inferrule[(R$\pi$-Struct)]{P \equiv P' \\ P \xrightarrow{\mu} Q \\ Q \equiv Q'}{P' \xrightarrow{\mu} Q'}
+    \end{align*}
+    \noindent\rule{12cm}{0.8pt}
+    \caption{Labelled Transition System for the standard typed $\pi$-calculus with linear types. We omit the symmetrical case of \textsc{(R-Open)} and we can assert by \textsc{(R-Res)} that this holds when composed with arbitrary process Q, s.t $n(P) \cap n(Q) = \emptyset$. }
+    \label{fig:linLTS}
+\end{figure}
+
+
+
+% \begin{figure}[ht]
+%     \centering
+%     \begin{align*}
+%         &\inferrule[(R$\pi$-Inp)]{ }{x?(\widetilde{y}).P \xrightarrow{x?(\widetilde{y})} P\{\widetilde{z} / \widetilde{y}}&
+%         &\inferrule[(R$\pi$-Out)]{ }{x!\langle \widetilde{v} \rangle.P \xrightarrow{x! \langle \widetilde{v} \rangle} P} 
+%         & \inferrule[(R$\pi$-Com)]{ }{x!\langle \widetilde{v} \rangle.P \: | \: x?(\widetilde{y}).Q \xrightarrow{\tau} P \: | \: Q\{\widetilde{v} / \widetilde{y} \}}
+%     \end{align*}
+%     \vspace{-10pt}
+%     \begin{align*}
+%         &\inferrule[(R$\pi$-Case)]{j \in I}{\text{case } l_j\_v \text{ of } \{l_i\_ (x_i) \vartriangleright P_i\}_{i\in I} 
+%         \rightarrow^{l_j\_ (x_j) \vartriangleright P_j} P_j\{v/x_j\}}& 
+%         &\inferrule[(R$\pi$-StndCom)]{P \xrightarrow{\mu} P' \\ Q \xrightarrow{\mu'} Q'}{P \; | \; Q \xrightarrow{\tau} P' \; | \; Q'}
+%     \end{align*}
+%     \vspace{-10pt}
+%     \begin{align*}
+%         &\inferrule[(R$\pi$-Par1)]{P \xrightarrow{\mu} Q \\ bn(\mu) \cap n(R) = \emptyset}{P \; | \; R \xrightarrow{\mu} Q \; | \; R }&
+%         &\inferrule[(R$\pi$-Par2)]{P \xrightarrow{\mu} Q \\ bn(\mu) \cap n(R) = \emptyset}{R \; | \; P \xrightarrow{\mu} R \; | \; P }
+%     \end{align*}
+%     \vspace{-10pt}
+%     \begin{align*}
+%         &\inferrule[(R$\pi$-ResClose)]{P \xrightarrow{\mu} Q \\ x \in bn(\mu)}{(\nu x) P \xrightarrow{\tau} (\nu x) Q}
+%         &\inferrule[(R$\pi$-ResOpen)]{P \xrightarrow{\mu} Q \\ x \not \in n(\mu)}{(\nu x)P \xrightarrow{\mu} (\nu x) Q}
+%     \end{align*}
+%     \vspace{-10pt}
+%     \begin{align*}
+%         &\inferrule[(R$\pi$-Close)]{P \xrightarrow{\mu} P' \\ Q \xrightarrow{\mu'} Q' \\ x \not \in fn(Q)}{P \; | \; Q \xrightarrow{\tau} (\nu x) (P \; | \; Q)}
+%         &\inferrule[(R$\pi$-Open)]{P \xrightarrow{x!\langle \widetilde{z} \rangle} P' \\ x \not = z}{(\nu z) P \xrightarrow{x!\langle \widetilde{z} \rangle} P'}
+%     \end{align*}
+%     \begin{align*}
+%         &\inferrule[(R$\pi$-Struct)]{P \equiv P' \\ P \xrightarrow{\mu} Q \\ Q' \equiv Q}{P' \xrightarrow{\mu} Q'}
+%     \end{align*}
+%     \noindent\rule{12cm}{0.8pt}
+%     \caption{Labelled transition system for the standard typed $\pi$-calculus adapted from \cite{sangiorgi2003pi}, \cite{sobocinski2007well}}
+%     \label{fig:LinLTS}
+% \end{figure}
+
+The LTS for $\pi^{linear}$ is defined in \autoref{fig:linLTS}. We define a labelled transition system based on the operational semantics presented in \cite{dardha2017session}. Our motivation for creating an LTS for $\pi^{linear}$ is such that we can compare the behaviour emitted between the two calculi. This has similar capabilities to the session typed LTS, although it is apparent that the $\pi^{linear}$ LTS has fewer axioms simply down to the omission of the selection process, instead this is captured by the $(R\pi-Output)$ axiom which is equivalent to sending a variant value.  
+
+We define this LTS in the standard way, including rules for scope extrusion $(R\pi-Close)$. We simplify the label on the case statement to emit the single label that it can evolve into. It is also important to notice that in $(R\pi-ResOpen)$ that when $P$ reduces to $Q$ by some action $\mu$ and it is under some restriction, if that action does not contain any bound names that action is observable. This is essential when defining barbed equivalences as discussed later.
+ 
+\section{Observability} \label{sec:Observables}
+
+We now introduce \textit{observability predicates} for $\pi^{session}$ and $\pi^{linear}$. To observe processes we introduce the \textit{evaluation context} \cite{DBLP:journals/jlp/FournetG05} otherwise known as a static context where a hole, $[.]$ only occurs once in context $C$. A hole intuitively is operationally equivalent to the inaction process and should be filled with a process $P$, such that $C[P]$. An evaluation context is an environment that can communicate with the process under observation but cannot block any internal reductions. Evaluation contexts are defined by the following grammar:
+
+\begin{equation*}
+    C[.] ::= [.] \: || \: C[.] \; |\; Q \:||\: Q \; | \; C[.] \: || \: \nu x.C[.]
+\end{equation*}
+% We first recall the definition of \textit{barbs} from \citep{DBLP:journals/jacm/PierceS00}. 
+
+\subsection{Barbs}
+
+\begin{definition}[Strong Barb]
+    $P$ has a strong barb on $x$ denoted $P \downarrow_{x!}$ (resp. $P \downarrow_{x?}$) when $P$ has the immediate capability to communicate on $x$ in an evaluation context such that $P \xrightarrow{\alpha} P' \: x \in fn(\alpha)$
+    \label{def:StrongBarb}
+\end{definition}
+
+% Due to the fact that testing is defined over a sequence of reductions, we are also motivated to introduce the definition of a weak barb.
+
+% \begin{definition}[Weak Barb]
+%     $P$ has a weak barb on $x$ denoted $P \Downarrow_{x!}$ (resp. $P \Downarrow_{x?}$) when there is some reduction sequence $P \rightarrow^* P'$ and $P' \downarrow_{x!}$.
+%     \label{Def:WeakBarb}
+% \end{definition}
+
+Here we use the reflexive and transitive closure of $\rightarrow$ which we will denote $\rightarrow^*$.
+% We use the formal definition of the weak transition relation from \citep{sangiorgi2003pi}.
+
+\subsection{Observables} 
+We present the formal definition of observable processes for both $\pi^{session}$ and $\pi^{linear}$ following the same process as \citep{demangeon2011full}. We discuss why this is only defined for outputs in section \autoref{discrepancy}.
+
+\begin{definition} [Observations]
+Given a channel $x$ and process $P$, $P$ has barb $x!$ written $P \downarrow_{x!}$:
+    \begin{itemize}
+    \item Iff $P \in \pi^{linear}, P \xrightarrow{\alpha} P'$ and $x \in fn(\alpha)$, 
+    \begin{itemize}
+        \item $P \downarrow_{x!}$ when $P \equiv (\nu \widetilde{c}) (x!(\widetilde{v}).P_1 \mid P_2)$ with $x \not \in \widetilde{c}$. As $x$ is free in P, and has the capability to output on channel $x$.
+    \end{itemize}
+    \item Iff $P \in \pi^{session},$ $P \xrightarrow{\alpha} P'$ and $x \in fn(\alpha)$, 
+    \begin{itemize}
+        \item $P \downarrow_{x!}$ when $P \equiv (\nu \widetilde{c}) (x!\langle v \rangle .P_1 \mid P_2)$ with $x \not \in \widetilde{c}$. As $x$ is free in P, and has the capability to output on channel $x$.
+        \item $P \downarrow_{x!}$ when $P \equiv (\nu \widetilde{c}) (x \vartriangleleft l_j.P_1 \mid P_2)$ with $x \not \in \widetilde{c}$. As $x$ is free in P, and has the capability to select (send a variant label) on channel $x$.
+    \end{itemize}
+    \end{itemize}
+    \label{def:observations}
+\end{definition}
+
+We include the composition of $P_2$ as we will be considering this to be an observer, such that we can impose testing equivalences. 
+
+% \subsection{Behavioural Equivalences}
+
+% In order to define the testing relations we need to first introduce further barbed equivalences on processes. An unfortunate discrepancy in \citep{demangeon2011full} is the missing appendix relating to the barbed equivalences and barbed congruence. Therefore we will define the barbed relations that will be necessary for replicating the results in \citep{10.1007/978-3-540-49382-2_9}. We recall the definition of \textit{strong barbed bisimilarity} from \citep{sangiorgi2003pi}.
+
+% \begin{definition}[Strong Barbed Bisimilarity]
+%     Strong barbed bisimilarity is the largest symmetric relation $\sim$ such that when $P \sim Q$:
+%     \begin{itemize}
+%         \item For all x, if $P \downarrow_{x!}$ then $Q \downarrow_{x!}$
+%         \item If $P \rightarrow P'$ then $Q \rightarrow Q'$ to some process $Q'$ such that $P' \sim Q'$
+%     \end{itemize}
+%     \label{def:strongBarbedBi}
+% \end{definition}
+
+% We use the definition of \textit{strong barbed congruence} as defined in \citep{dardha2017session}. We define contexts as the 
+
+% \begin{definition}[Strong Barbed Congruence]
+%     Two processes $P, Q$ are strong barbed congruent, denoted $\simeq$, if $P \sim Q$ when placed in any arbitrary context $C$.
+%     \label{def:sbc}
+% \end{definition}
+
+
+% Contextual Equivalence for the Pi-Calculus that can Stop
+
+\subsection{Testing}
+
+We adapt the definition from \citep{DBLP:journals/entcs/CacciagranoCAV08test} and note the similarities with \citep{10.1007/978-3-540-49382-2_9}. 
+
+\begin{definition}[Observers] Considering $\pi^{session}$ and $\pi^{linear}$
+
+
+    \begin{itemize}
+        \item The set of names $N$ is extended $N'$ to include the success action $\omega$ such that $N' = N \cup {\omega}$ where $\omega \not \in N$. $fn(\omega) = \omega$ and $bn(\omega) = \emptyset$.
+        \item The set $O$ of observers (ranged over by terms $o, o', o'',..., E, E',E'',...$) is defined by the syntax of $P, Q$, with the extension of $P::= \omega.P$.
+        \item $\xrightarrow{\omega}$ is the least predicate over $O$ that satisfy the rules in \autoref{fig:successRelation}
+    \end{itemize}
+\end{definition}
+
+\begin{figure}[h]
+    \centering
+    \begin{align*}
+        &\inferrule[(Omega)]{ }{\omega.E \xrightarrow{\omega}} &
+        & \inferrule[(Res)]{E \xrightarrow{\omega}}{(\nu x)E \xrightarrow{\omega}}
+    \end{align*}
+    \begin{align*}
+        &\inferrule[(Par)]{E_1 \xrightarrow{\omega}}{E_1 \: | \: E_2 \xrightarrow{\omega}} & 
+        & \inferrule[(Cong)]{E' \xrightarrow{\omega} \\ E' \equiv E}{E \xrightarrow{\omega}}
+    \end{align*}
+    \caption{The $\xrightarrow{\omega}$ predicate rules}
+    \label{fig:successRelation}
+\end{figure}
+
+\begin{definition}[Maximal Computations]
+    For all processes $P$ and observers $o$, a maximal computation from $P \: | \: o$
+    \begin{equation*}
+        P \: | \: o = E_0 \:\rightarrow\: E_1 \: \rightarrow \: E_2 \rightarrow \: ...
+    \end{equation*}
+    or a finite sequence
+    \begin{equation*}
+        P \: | \: o = E_0 \: \rightarrow \: E_1 \: \rightarrow \: ... \: E_n \: \not \rightarrow
+    \end{equation*}
+    \label{MaximalComp}
+\end{definition}
+
+% We adapt the definition \cite{DBLP:journals/entcs/CacciagranoCAV08test} of may, must and test relations to include barbs.
+
+% \begin{definition}[May, must and test relations]
+%     For all process $P$, observers $o$ and observable actions $\alpha$
+%     \begin{itemize}
+%         \item $P \Downarrow^{may}_{\alpha} o$ iff there is a maximal computation such that $E_i \xrightarrow{\omega}$ and $P_i \downarrow{\alpha}$, for some $i \ge 0$.
+%         \item $P \Downarrow^{must}_{\alpha} o$ iff for every maximal computation there exists $i \ge 0$ such that $E_i \xrightarrow{\omega}$ and $P_i \downarrow{\alpha}$.
+%         \item $P \Downarrow^{test}_{\alpha} o$ is the union of $\Downarrow^{may}$ and $\Downarrow^{must}$
+%     \end{itemize}
+%     \label{TestingRelation}
+% \end{definition}
+
+Testing using observers is not well documented in the literature, this will be discussed further in the future work section. We will acknowledge these definitions of observers, and assume their existence in all future testing equivalences and predicates.
+
+We adapt the definition \cite{DBLP:journals/jlp/FournetG05} and \cite{10.1007/978-3-540-49382-2_9} of may and must testing equivalences ($\sqsubseteq_{may}, \sqsubseteq_{must}$)  with respect to the may and must testing congruences ($\simeq_{may}, \simeq_{must}$)
+
+\subsubsection{May and Must Predicates}The may predicate $\Downarrow^{may}_{x}$ detects whether a process can emit a name on $x$ after performing 0 or more internal reductions. 
+\vspace{10pt}
+
+\begin{definition}[May Testing Predicate]
+    $P \Downarrow^{may}_{x}$. For some maximal computation starting from $P$, there exists $P'$ such that $P \rightarrow^* P'$ and $P' \downarrow_{x}$.
+    \label{def:maypred}
+\end{definition}
+\vspace{10pt}
+\begin{definition}[May Testing Equivalence]
+    $P \sqsubseteq_{may} Q$. $P \Downarrow^{may}_{x}$ implies $Q \Downarrow^{may}_{x}$.
+    \label{def:mayequiv}
+\end{definition}
+\vspace{10pt}
+\begin{definition}[May Testing Congruence]
+    $P \simeq_{may} Q$. For all evaluation contexts $C[.]$. $C[P] \sqsubseteq_{may} C[Q]$ and $C[Q] \sqsubseteq_{may} C[P]$.
+    \label{def:maycong}
+\end{definition}
+The must testing predicate asserts that $P$ always retains the ability to communicate on $x$ after any sequence of internal reductions. It is defined over all finite traces of some process $P$.
+\vspace{10pt}
+\begin{definition}[Must Testing Predicate]
+    $P \Downarrow^{must}_{x}$. For every maximal computation starting from $P$, for all $P'$ such that $P \rightarrow^* P'$, $P\not \rightarrow$ implies $P' \downarrow_{x}$.
+    \label{def:mustpred}
+\end{definition}
+\vspace{10pt}
+\begin{definition}[Must Testing Equivalence]
+    $P \sqsubseteq_{must} Q$. $P \Downarrow^{must}_{x}$ implies $Q \Downarrow^{must}_{x}$.
+    \label{def:mustequiv}
+\end{definition}
+\vspace{10pt}
+\begin{definition}[Must Testing Congruence]
+    $P \simeq_{must} Q$. For all evaluation contexts $C[.]$. $C[P] \sqsubseteq_{must} C[Q]$ and $C[Q] \sqsubseteq_{must} C[P]$.
+    \label{def:mustcong}
+\end{definition}
+\vspace{10pt}
+We define the $\sqsubseteq_{test}$ relation as the union of $\sqsubseteq_{may}$ and $\sqsubseteq_{must}$ and the following congruence $\simeq_{test}$ is the union of $\simeq_{may}$ and $\simeq_{must}$.
+
+\subsubsection{Discrepancy in testing} \label{discrepancy}
+There is a discrepancy in the literature \cite{piThatStop} \cite{DBLP:conf/fossacs/BorealeNP99} \cite{10.1007/978-3-540-49382-2_9} \cite{castellan2019two} surrounding whether an observer can detect when a process offers the input action. There are claims in different subsets of papers that the synchronous/asynchronous calculus cannot observe inputs as it would be detecting when the observers' output would be consumed. In a non-deterministic context this could lead to a situation in which the composed process for some process $P$ and observer $o$ $(P \: | \: (x!\langle v \rangle.E)) \xrightarrow{\omega} (P \: | \: o_i)$, and so the test would not be synchronised, reaching a point where $P_n \rightarrow$ and $o_n \not \rightarrow$. We will leave this as an open question for the reader, for this paper however we will only consider the case where only the output actions can be observed.
+
+% We adapt the defintion of testing from \citep{DBLP:conf/fossacs/BorealeNP99}. We recall that the observer does not have the capability to observe an input action. A process $P \not \rightarrow$ will be referred to as \textit{stable}.
+
+% \begin{definition}[Observers]
+%     We define the distinct success action $\omega$. A \textit{computation} with process $P$ and observer $\varepsilon$ is a sequence of transitions $P \: | \: \varepsilon = P_0 \: | \: \varepsilon_0 \xrightarrow{\tau} P_1 \: | \: \varepsilon_1 \: ... \: P_n \: | \: \varepsilon_n$ such that $P_n \: | \: \varepsilon_n$ is stable. The computation is \textit{successful} if there exists $n \ge 0$ such that $\varepsilon_n \xrightarrow{\omega}$.
+% \end{definition}
+
+% It suffices to say that if the computation eventually terminates then the computation is successful. We will now introduce may testing which stipulates that a certain name is communicated upon to induce a successful computation.
+
+% \begin{definition}[May Testing]
+%     For all processes $P$ and observers $\varepsilon$, $P \Downarrow^{may}$ iff there exists a successful computation $P \: | \: \varepsilon$
+% \end{definition}
+
+% We include the weak labelled transitions defined in \citep{10.1007/978-3-540-49382-2_9} such that:
+
+% \begin{align*}
+%     &P \xRightarrow{\delta} \text{ iff } P \xrightarrow{\tau}^* P' \\
+%     &P \xRightarrow{\alpha} \text{ iff } P \xRightarrow{\delta} \: \xrightarrow{\alpha} \: \xRightarrow{\delta} P'
+% \end{align*}
+    
+% \begin{definition}[May Barbed Testing]
+%     For all processes $P$ and observers $\varepsilon$, $P \Downarrow^{may}_{\alpha !}$ (resp. $P \Downarrow^{may}_{\alpha ?}$) implies that there exists $P \xRightarrow{\alpha} P'$ for some computation $P \: | \: \varepsilon$. This implies $\exists R. P \xRightarrow{\delta} R$ and $R \downarrow_{\alpha !}$ (resp. $\downarrow_{\alpha ?}$) and $R \not \rightarrow$.
+% \end{definition}
+
+% The motivation for stating that $R \not \rightarrow$ as the process output will be consumed by observer $\varepsilon$, otherwise the process will not continue.
+
+
+% We extend this definition to include the strong barb on some name $x$.
+
+% \begin{definition}[May Barbed Testing]
+    % For some name $x$, process $P$ may communicate on name $x$ denoted $P \Downarrow^{may}_{x!}$ (resp. $P \Downarrow^{may}_{x?}$) iff there exists a successful computation $P \: | \: \varepsilon$ such that for some $n \ge 0$, $P_n \downarrow_{x!}$ (resp. $P_n \downarrow_{x?}$).
+% \end{definition}
+
+% To illustrate this notion we construct the example:
+
+% \begin{align*}
+%     & P \equiv (\nu x) (x!\langle v \rangle.y!\langle v' \rangle.0) \hspace{10pt} \varepsilon \equiv \omega.y?(a).0 \vspace{10pt}\\
+%     & P \: | \: \varepsilon \xrightarrow{\tau} P' \: | \: \varepsilon' \: \boldsymbol{R} \: P'' \: | \: \varepsilon'' \vspace{10pt}\\
+%     & \boldsymbol{R} = (P', \{y!\langle v \rangle\}, P'') \cup (\varepsilon', \{y?(v)\}, \varepsilon'') \\
+%     & \text{implies } P\downarrow_{x!}
+% \end{align*}
+    
+% We adapt the definiton from \cite{10.1007/978-3-540-4 
+
+% We adapt the definition of preorder presented in \citep{DBLP:conf/fossacs/BorealeNP99} and apply it to the definition of strong barbed bisimilarity \autoref{def:strongBarbedBi} to obtain the relation
+
+% \begin{definition}[May, Must and Test Equivalences]
+%     $P \sim_{m} Q$ if for every observer $o$, $P \Downarrow^{m}_{\alpha} o$ implies $Q \Downarrow^{m}_{\alpha} o$ where $m = \{may, must\}$ 
+%     \label{TestingPre}
+% \end{definition}
+
+% This leads us to the necessary may, must and test congruences
+
+% \begin{definition}[May, Must and Test Congruences]
+%     $P \simeq_{m} Q$ if for every observer $o$, and testing context $C$, $C[P] \sim_m C[Q]$ iff $C[Q] \sim_m C[P]$ where $m = \{may, must\}$
+%     \label{TestingCong}
+% \end{definition}
+
+\subsection{Full Abstraction}
+
+Due to the renaming function mechanism in the encoded $\pi^{linear}$, we need to first state that if an action is observable in the un-encoded term then the term under renaming in $\pi^{linear}$ is still observable.
+\vspace{10pt}
+\begin{lemma}[Channel Renaming]
+    For all observable actions $\alpha$ if $P \downarrow_{\alpha}$ then $\llbracket P \rrbracket \downarrow_{f_\alpha}$
+    \label{Lem:ChannelRename}
+\end{lemma}
+
+We prove this by structural induction on the observable actions defined in \autoref{fig:sessLTS} and demonstrate that they correlate to an observable action in \autoref{fig:linLTS} such that $P \downarrow_\alpha$ implies $\llbracket P \rrbracket \downarrow_{f_{\alpha}}$
+
+We adapt the theorem from \citep{dardha2017session} to state that there is an operational correspondance between the encoded and un-encoded terms. Let $\hookrightarrow$ denote $\equiv$ extended with \textit{case normalisation} which is defined by (R$\pi$-Case).
+\vspace{10pt}
+\begin{theorem}[Operational Correspondance]
+    Let $P$ be a session process, $\Gamma$ a session typing context, $\alpha$ be the arbitrary set of observable actions and $f$ a renaming function for $P$ such that $\llbracket \Gamma \rrbracket_f \vdash \llbracket P \rrbracket_f$.
+    
+    \begin{enumerate}
+        \item If $P \xrightarrow{\alpha} P'$, then $\llbracket P \rrbracket_f \xrightarrow{\alpha}\hookrightarrow \llbracket P' \rrbracket_f$.
+        \item If $\llbracket P \rrbracket_f \xrightarrow{\alpha} Q$ then there is a session process $P'$ such that
+        \begin{itemize}
+            \item either $P \xrightarrow{\alpha} P'$;
+            \item or there are $x, y$ such that $(\nu xy)P \xrightarrow{\alpha} P'$ and $Q \hookrightarrow \llbracket P' \rrbracket_f$
+        \end{itemize}
+    \end{enumerate}
+    \label{Lem:OperationalCorr}
+\end{theorem}
+
+As mentioned in \citep{demangeon2011full} a crucial part of the full abstraction proof is demonstrating that the encoding is definable. This is not mentioned in the majority of the full abstraction definitions in the literature.
+\vspace{10pt}
+\begin{lemma}[Definability]
+    For all $P \in \pi^{linear}$, $\Gamma \in \pi^{session}$ such that $\llbracket \Gamma \rrbracket \vdash P$ exists $R \in \pi^{session}$ such that $\Gamma \vdash R$ and $P \simeq_{test} \llbracket R \rrbracket$
+    \label{Lem:Definability}
+\end{lemma}
+
+A sketch of the proof is described in \citep{demangeon2011full}. Considering the term $P \in \pi^{linear}$ find the corresponding $\pi^{session}$ process through decoding. At every hidden output that isn't hereditarily typed in $\llbracket \Gamma \rrbracket$ place the relevant encoding of a session type. It is then sufficient to say that the process now typed with the encoding of session types has not changed behaviour that the terms are equivalent. To complete the proof perform induction on the typing rules of $\pi^{linear}$ to define the shape of the encoded process and devise the finer results of the equivalence by induction on the size of $P$. 
+
+It is mentioned in \citep{sangiorgi2003pi} that if the operational correspondence holds then it follows that the encoding is computationally adequate. We are more explicit and adapt the definition of computational adequacy from \citep{demangeon2011full} we derive the following lemma
+\vspace{10pt}
+\begin{lemma}[Adequacy]
+    For all $P \in \pi^{session}$ such that $\Gamma \vdash P$, $P \sqsubseteq_{test} \llbracket P \rrbracket$
+    \label{Lem:Adequacy}
+\end{lemma}
+
+To prove that $\pi^{session}$ is computably adequate be need to use Theorem \ref{Lem:OperationalCorr} to acquire the process in its encoded form. We then demonstrate by co-induction on the observable actions of $P$ and use Lemma \ref{Lem:ChannelRename} to demonstrate that every process holds under may and must testing.
+
+\begin{lemma}[Blockingness]
+    If $\Gamma \vdash_{session} P$, then $P \not \rightarrow$ if and only if $\llbracket P \rrbracket \not \rightarrow$
+    \label{lem:blocking}
+\end{lemma}
+
+\vspace{10pt}
+\begin{theorem}[Full Abstraction]
+    Let $P, Q$ be two $\pi^{session}$ processes such that $\Gamma \vdash P$ and $\Gamma \vdash Q$, then $P \simeq_{test} Q$ iff $\llbracket P \rrbracket \simeq_{test} \llbracket Q \rrbracket$.
+    \label{Th:FullAbstraction}
+\end{theorem}
+
+To simplify the proof we complete this theorem by defining the soundness and completeness lemmas \cite{DBLP:journals/mscs/GorlaN16fullabsmyths}, to demonstrate both directions of the equivalence.
+\vspace{10pt}
+\begin{lemma}[Completeness]
+    Let $P, Q$ be two $\pi^{session}$ processes such that $\Gamma \vdash P$ and $\Gamma \vdash Q$, then $P \simeq_{test} Q$ implies $\llbracket P \rrbracket \simeq_{test} \llbracket Q \rrbracket$.
+    \label{Lem:Soundess}
+\end{lemma}
+\vspace{10pt}
+We will prove this by defining the relation $R$ such that $R \subseteq \: \sqsubseteq_{test}$ by first proving $R \subseteq \: \sqsubseteq_{may}$ and then $R \subseteq \: \sqsubseteq_{must}$. To assert that the testing equivalences hold we perform a coinductive proof on the observable actions, and use Lemma \ref{Lem:ChannelRename} to demonstrate that it holds in the encoding. We will then demonstrate this holds in any arbitrary testing context $C$ such that we can infer $R \subseteq \simeq_{test}$. 
+\vspace{10pt}
+\begin{lemma}[Soundness]
+    Let $P, Q$ be two $\pi^{session}$ processes such that $\Gamma \vdash P$ and $\Gamma \vdash Q$, then $\llbracket P \rrbracket \simeq_{test} \llbracket Q \rrbracket$ implies $P \simeq_{test} Q$.
+    \label{Lem:Completeness}
+\end{lemma}
+\vspace{10pt}
+We will follow a similar process to the soundness lemma, and show that the relation $R$ between $P, Q$ is a subset of the $\sqsubseteq_{test}$ equivalence through coinduction on the observable processes of $P$. 
+
+\end{document}
